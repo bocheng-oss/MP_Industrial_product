@@ -1,1 +1,0 @@
-# MP_Industrial_product
