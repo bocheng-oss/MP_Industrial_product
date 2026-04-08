@@ -145,7 +145,8 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxw9A0k4KZAOakCcx2CnNtcOfXnioR06jGhgIKpcB5-n4yMFKe_X4AT2mSLGLU_28N0/exec'; // 改為您的正式網址
+    // 【重要】請將下方網址替換為您的 Google Apps Script 部署 URL (以 /exec 結尾)
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxw9A0k4KZAOakCcx2CnNtcOfXnioR06jGhgIKpcB5-n4yMFKe_X4AT2mSLGLU_28N0/exec'; 
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
@@ -217,13 +218,19 @@
     }
 
     async function callBackend(action, extra) {
+      if (API_URL.includes('您的_GAS_WEBAPP')) {
+        return { success: false, error: '尚未填寫 API 網址 (第 141 行)' };
+      }
       try {
         const res = await fetch(API_URL, {
           method: 'POST', headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ action, access_code: ACCESS_CODE, ...extra })
         });
-        return await res.json();
-      } catch (e) { return { success: false, error: '離線' }; }
+        const data = await res.json();
+        return data;
+      } catch (e) { 
+        return { success: false, error: '連線被拒或網址無效 (請檢查 GAS 部署是否設為「任何人」)' }; 
+      }
     }
 
     function showStatus(m, c) {
