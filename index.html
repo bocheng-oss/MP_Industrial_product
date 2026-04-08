@@ -49,59 +49,67 @@
   </div>
 
   <div id="app" class="locked">
-    <header class="h-[52px] brand-bg flex items-center justify-between px-6 shadow-md shadow-red-900/10">
-      <div class="flex items-center gap-3">
-        <span class="font-bold text-white tracking-wider">工業產品辨識終端</span>
-        <span class="hidden md:block text-[9px] text-white/50 bg-white/10 px-2 py-0.5 rounded">INTERNAL DEMO</span>
+    <header class="brand-bg" id="header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:28px;height:28px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" fill="#e2231a" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:bold;color:#fff;line-height:1.1;">工業產品辨識終端</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.5);letter-spacing:.3px;">VISUAL IDENTIFICATION TERMINAL</div>
+        </div>
       </div>
-      <div class="flex items-center gap-4 text-white font-mono text-sm font-bold">
-        <span id="clock">--:--:--</span>
-        <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>ONLINE</div>
+      <div style="display:flex;align-items:center;gap:10px;color:#fff;">
+        <span id="clock" style="font-family:monospace;font-size:12px;font-weight:bold;background:rgba(255,255,255,0.1);padding:3px 8px;border-radius:3px;">--:--:--</span>
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:bold;">
+          <div id="status-dot"></div>ONLINE
+        </div>
       </div>
     </header>
 
     <main id="main">
-      <div class="flex flex-col gap-3 min-h-0">
-        <div class="card flex-grow flex flex-col p-4">
-          <div class="flex justify-between items-center mb-3">
-             <div class="flex items-center gap-2 brand-text font-bold text-sm"><span class="w-1.5 h-4 brand-bg rounded-full"></span>鏡頭視角</div>
+      <div id="left-col">
+        <div id="camera-card" class="card">
+          <div id="camera-header">
+             <div class="flex items-center gap-2 brand-text font-bold text-xs"><span class="w-1 h-3 brand-bg rounded-full"></span>鏡頭視角</div>
              <select id="cam-select" class="setting-input w-auto"></select>
           </div>
           <div id="video-wrapper">
              <video id="video" autoplay playsinline muted></video>
-             <div id="scanner-box"><div class="absolute -top-6 left-0 text-[9px] brand-bg text-white px-2 py-0.5 rounded shadow">辨識靶區</div></div>
+             <div id="scanner-box">
+                <div id="scanner-label">辨識靶區</div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+             </div>
           </div>
-          <button id="capture-btn" onclick="capture()" class="mt-4 brand-bg text-white font-bold py-4 rounded-xl text-lg shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-all">
-             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <button id="capture-btn" onclick="capture()">
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
              啟動影像辨識
           </button>
         </div>
-        <div class="card grid grid-cols-3 gap-4 p-3 border-t-4 border-red-500">
-           <div><label class="text-[9px] font-bold text-gray-400 block mb-1">曝光 (MS)</label><input type="number" value="50" class="setting-input"></div>
-           <div><label class="text-[9px] font-bold text-gray-400 block mb-1">模型</label><select class="setting-input"><option>Gemma V4</option></select></div>
-           <div><label class="text-[9px] font-bold text-gray-400 block mb-1">狀態</label><div class="bg-green-50 text-green-600 text-[10px] p-1.5 rounded-lg text-center font-bold">READY</div></div>
+        <div id="settings-bar" class="card">
+           <div><div class="setting-label">曝光 (MS)</div><input type="number" value="50" class="setting-input"></div>
+           <div><div class="setting-label">模型</div><select class="setting-input"><option>Gemma V4</option></select></div>
+           <div><div class="setting-label">狀態</div><div class="text-[10px] text-green-600 font-bold bg-green-50 p-1 rounded text-center">READY</div></div>
+           <div><div class="setting-label">模式</div><div class="text-[10px] text-blue-600 font-bold bg-blue-50 p-1 rounded text-center">AUTO</div></div>
         </div>
       </div>
 
-      <div class="flex flex-col gap-3 min-h-0">
-        <div class="card flex flex-col p-5 h-full">
-           <div class="flex items-center gap-2 brand-text font-bold text-sm mb-4"><span class="w-1.5 h-4 brand-bg rounded-full"></span>辨識結果分析</div>
-           <div class="mb-4">
-              <label class="text-[10px] font-black text-gray-400 mb-2 block uppercase">裁切影像預覽</label>
-              <div class="h-28 bg-gray-50 rounded-xl overflow-hidden border-2 border-dashed border-gray-100 flex items-center justify-center">
-                 <img id="preview-img" class="h-full object-contain" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ccc'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3C/svg%3E">
-              </div>
+      <div id="right-col">
+        <div id="result-card" class="card">
+           <div class="field-label mb-2">辨識結果分析</div>
+           <div id="preview-wrapper">
+              <img id="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ccc'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3C/svg%3E">
            </div>
-           <div class="bg-red-50 rounded-xl p-4 mb-4 border border-red-100 text-center">
+           <div id="ai-box">
+              <div id="ai-label"><span>AI 預測</span><span id="conf-val">0%</span></div>
               <div id="ai-result">--</div>
-              <div class="h-1 bg-red-100 rounded-full mt-2"><div id="conf-bar" class="h-full brand-bg w-0 transition-all duration-1000"></div></div>
+              <div id="conf-track"><div id="conf-bar"></div></div>
            </div>
-           <div class="mb-6">
-              <div class="flex justify-between items-center mb-1"><label class="text-[10px] font-black text-gray-400 uppercase">人工確認</label><button onclick="syncAI()" class="text-[10px] brand-text font-bold">套用結果</button></div>
-              <input type="text" id="manual-input" placeholder="..." class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-2xl font-mono font-bold focus:border-red-500 transition-all outline-none">
-           </div>
-           <div id="status-msg" class="hidden text-[10px] font-bold text-center p-2 rounded-lg mb-4"></div>
-           <button id="save-btn" onclick="saveRecord()" class="mt-auto">確認並儲存</button>
+           <div class="field-label">人工確認 <button onclick="syncAI()" class="brand-text">套用</button></div>
+           <input type="text" id="manual-input" placeholder="...">
+           <div id="status-msg"></div>
+           <button id="save-btn" onclick="saveRecord()">確認並儲存</button>
         </div>
       </div>
     </main>
@@ -110,12 +118,10 @@
   <canvas id="crop-canvas" style="display:none;"></canvas>
 
   <script>
-    // 【重要】請部署 GAS Web App 後，將得到的網址填入下方
     const API_URL = 'https://script.google.com/macros/s/AKfycbwXon0gyjS6ada2WhgQN1UjiS2vGyYqtu0_F9vG-r87DjEhrvnFa5ZX1P04tr7bqLy2/exec';
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
-    // --- 安全驗證邏輯 ---
     window.addEventListener('load', () => {
       if (ACCESS_CODE) {
         document.getElementById('access-code').value = ACCESS_CODE;
@@ -126,8 +132,6 @@
     async function checkAccess() {
       const input = document.getElementById('access-code').value;
       if (!input) return;
-      
-      // 此處僅做前端解鎖，核心驗證在後端 API
       ACCESS_CODE = input;
       localStorage.setItem('demo_access_code', input);
       document.getElementById('login-overlay').style.opacity = '0';
@@ -138,7 +142,6 @@
       }, 500);
     }
 
-    // --- 相機邏輯 ---
     async function initCameras() {
       try {
         const tmp = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -159,14 +162,9 @@
 
     document.getElementById('cam-select').onchange = (e) => startStream(e.target.value);
 
-    // --- API 串接邏輯 (核心改動) ---
     async function callBackend(action, extraData = {}) {
       try {
-        const payload = {
-          action: action,
-          access_code: ACCESS_CODE,
-          ...extraData
-        };
+        const payload = { action: action, access_code: ACCESS_CODE, ...extraData };
         const res = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
