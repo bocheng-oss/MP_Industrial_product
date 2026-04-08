@@ -360,7 +360,7 @@
             <select id="cam-sel"
               class="text-[10px] bg-gray-50 px-2 py-1 rounded font-bold border-none outline-none"></select>
           </div>
-          <div id="video-container" class="h-[55vh] bg-black rounded-lg overflow-hidden relative border border-gray-200">
+          <div id="video-container" style="height: 55vh;" class="bg-black rounded-lg overflow-hidden relative border border-gray-200">
             <video id="video" class="w-full h-full object-contain" autoplay playsinline muted></video>
             <div id="scanner-box">
               <div class="scan-corner tl"></div>
@@ -379,8 +379,8 @@
           <div class="text-xs font-bold flex items-center gap-2 mb-3 brand-text flex-none"><span
               class="w-1.5 h-4 brand-bg rounded-sm"></span>辨識結果</div>
           
-          <div id="preview-area" class="h-[55vh] bg-[#fdfdfd] rounded-lg border border-gray-100 flex items-center justify-center overflow-hidden">
-            <img id="preview-img" class="max-h-full max-w-full object-contain"
+          <div id="preview-area" style="height: 55vh;" class="bg-[#fdfdfd] rounded-lg border border-gray-100 flex items-center justify-center overflow-hidden">
+            <img id="preview-img" style="max-height: 100%; max-width: 100%; object-fit: contain;"
               src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' fill='%23eee'%3E%3Crect width='1000' height='1000'/%3E%3C/svg%3E">
           </div>
 
