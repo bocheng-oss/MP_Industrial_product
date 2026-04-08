@@ -305,6 +305,10 @@
         <button onclick="toggleSettings(false)" class="opacity-70 hover:opacity-100 text-2xl">&times;</button>
       </div>
       <div class="p-5 flex flex-col gap-4">
+        <div>
+          <div class="lbl-gray text-[10px] font-bold mb-1.5 uppercase">系統連線位址 (API URL)</div>
+          <input type="text" id="api-url-input" class="control-input font-normal" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <div class="lbl-gray text-[10px] font-bold mb-1.5 uppercase">曝光度 (MS)</div>
@@ -407,16 +411,24 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    let API_URL = localStorage.getItem('demo_api_url') || 'https://script.google.com/macros/s/AKfycbxw9A0k4KZAOakCcx2CnNtcOfXnioR06jGhgIKpcB5-n4yMFKe_X4AT2mSLGLU_28N0/exec';
-    document.getElementById('api-url-input').value = API_URL;
+    let API_URL = localStorage.getItem('demo_api_url') || '';
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
+    if (API_URL) document.getElementById('api-url-input').value = API_URL;
+
     function toggleSettings(show) {
-      document.getElementById('settings-overlay').style.display = show ? 'flex' : 'none';
-      if (!show) {
-        API_URL = document.getElementById('api-url-input').value;
-        localStorage.setItem('demo_api_url', API_URL);
+      const modal = document.getElementById('settings-overlay');
+      if (show) {
+        modal.style.display = 'flex';
+      } else {
+        modal.style.display = 'none';
+        // 儲存設定
+        const newUrl = document.getElementById('api-url-input').value.trim();
+        if (newUrl) {
+          API_URL = newUrl;
+          localStorage.setItem('demo_api_url', API_URL);
+        }
       }
     }
 
