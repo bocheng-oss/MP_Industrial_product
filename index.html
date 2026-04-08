@@ -281,11 +281,16 @@
 <body>
 
   <div id="login-overlay">
-    <div class="bg-white p-8 rounded-2xl shadow-2xl w-80 text-center">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-80 text-center relative">
+      <!-- 登入頁專用的緊急設定按鈕，防止 API 網址填錯導致死鎖 -->
+      <button onclick="toggleSettings(true)" class="absolute top-4 right-4 text-gray-300 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
       <div class="text-2xl font-bold mb-6 brand-text">工業辨識登入</div>
       <input type="password" id="access-code" placeholder="請輸入存取碼"
         class="w-full bg-slate-50 p-4 rounded-xl text-center mb-6 outline-none font-bold border border-gray-100">
-      <button onclick="checkAccess()" class="w-full brand-bg text-white py-4 rounded-xl font-bold text-lg">進入系統</button>
+      <div id="login-er-msg" class="hidden text-red-500 text-xs font-bold mb-4"></div>
+      <button id="login-btn" onclick="checkAccess()" class="w-full brand-bg text-white py-4 rounded-xl font-bold text-lg transition-opacity">進入系統</button>
     </div>
   </div>
 
@@ -415,13 +420,33 @@
       }
     }
 
-    function checkAccess() {
+    async function checkAccess() {
+      const btn = document.getElementById('login-btn');
+      const err = document.getElementById('login-er-msg');
       const code = document.getElementById('access-code').value;
       if (!code) return;
-      ACCESS_CODE = code;
-      localStorage.setItem('demo_access_code', code);
-      document.getElementById('login-overlay').style.display = 'none';
-      initCams();
+
+      btn.disabled = true; btn.style.opacity = '0.5'; btn.innerText = '連線中...';
+      err.classList.add('hidden');
+
+      try {
+        const res = await callBackend('checkAccess', { code });
+        if (res.success && res.result === true) {
+          ACCESS_CODE = code;
+          localStorage.setItem('demo_access_code', code);
+          document.getElementById('login-overlay').style.display = 'none';
+          initCams();
+        } else {
+          err.innerText = '⚠️ 存取碼不正確，請重新輸入';
+          err.classList.remove('hidden');
+        }
+      } catch (e) {
+        console.error(e);
+        err.innerText = '❌ 連線失敗！請檢查設定中的 API 網址';
+        err.classList.remove('hidden');
+      } finally {
+        btn.disabled = false; btn.style.opacity = '1'; btn.innerText = '進入系統';
+      }
     }
     if (ACCESS_CODE) { document.getElementById('access-code').value = ACCESS_CODE; checkAccess(); }
 
