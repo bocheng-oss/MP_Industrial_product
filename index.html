@@ -4,226 +4,210 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- 防護 1: 阻擋搜尋引擎收錄 -->
   <meta name="robots" content="noindex, nofollow">
-  <title>工業辨識終端 (Internal Use)</title>
+  <title>工業辨識系統 - 極簡版</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; background: #F0F2F5; color: #333; }
-    .brand-bg { background-color: #e2231a; }
+    html, body { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; background: #f0f2f5; }
+    .brand-bg { background: #e2231a; }
     .brand-text { color: #e2231a; }
-    .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
-
-    #login-overlay { position: fixed; inset: 0; z-index: 999; background: #e2231a; display: flex; align-items: center; justify-content: center; padding: 20px; transition: opacity .5s; }
-    #app { display: flex; flex-direction: column; height: 100vh; filter: blur(0); }
-    #app.locked { filter: blur(10px); }
-
-    #main { flex: 1; display: grid; grid-template-columns: 1fr 360px; gap: 12px; padding: 12px; min-height: 0; }
-    #video-wrapper { flex: 1; position: relative; background: #000; border-radius: 8px; overflow: hidden; }
-    #video { width: 100%; height: 100%; object-fit: cover; }
-    #scanner-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 260px; height: 120px; border: 2.5px solid #e2231a; border-radius: 4px; z-index: 5; pointer-events: none; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 10px; display: flex; flex-direction: column; min-height: 0; }
     
-    .setting-input { width: 100%; background: #F5F7FA; border: none; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: bold; outline: none; }
-    #ai-result { font-family: monospace; font-size: 32px; font-weight: bold; color: #e2231a; text-align: center; }
-    #save-btn { background: #e2231a; color: #fff; border-radius: 8px; padding: 14px; font-weight: bold; opacity: 0.3; pointer-events: none; transition: all .3s; }
-    #save-btn.ready { opacity: 1; pointer-events: auto; }
+    /* Login Overlay */
+    #login-overlay { position: fixed; inset: 0; z-index: 999; background: #e2231a; display: flex; items-center: center; justify-content: center; padding: 20px; }
+    
+    /* Layout */
+    #layout { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+    #header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; flex-shrink: 0; color: #fff; }
+    #main { flex: 1; display: grid; grid-template-columns: 1fr 320px; gap: 8px; padding: 8px; min-height: 0; }
+    
+    /* Left Column */
+    #cam-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    #video-container { flex: 1; background: #000; position: relative; border-radius: 6px; overflow: hidden; }
+    #video { width: 100%; height: 100%; object-fit: contain; }
+    #scanner-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 100px; border: 2px solid #e2231a; z-index: 10; pointer-events: none; }
+    
+    /* Right Column */
+    #info-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; }
+    #preview-area { height: 70px; background: #f8f9fa; border: 1px dashed #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    #preview-img { max-height: 100%; max-width: 100%; }
+    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 6px; padding: 8px; margin-bottom: 8px; text-align: center; }
+    #ai-res-val { font-size: 26px; font-weight: bold; color: #cf1322; font-family: monospace; }
+    
+    .btn { height: 44px; border-radius: 6px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all .2s; cursor: pointer; border: none; }
+    .btn-red { background: #e2231a; color: #fff; width: 100%; }
+    .btn-red:active { filter: brightness(0.9); }
+    .btn-disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; width: 100%; }
+
+    .input-field { background: #f5f5f5; border: 1px solid #d9d9d9; border-radius: 4px; padding: 6px 10px; font-size: 16px; font-family: monospace; font-weight: bold; width: 100%; outline: none; }
+    .lbl { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; margin-bottom: 3px; }
   </style>
 </head>
 
 <body>
 
-  <!-- 防護 2: 存取驗證鎖 -->
+  <!-- 登入鎖 -->
   <div id="login-overlay">
-    <div class="bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-sm text-center">
-      <div class="w-16 h-16 brand-bg rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg">
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-      </div>
-      <h2 class="text-xl font-bold mb-2">工業辨識系統</h2>
-      <p class="text-gray-400 text-xs mb-8 uppercase tracking-widest">Internal Access Required</p>
-      <input type="password" id="access-code" placeholder="輸入存取代碼" class="w-full bg-gray-100 border-none rounded-xl p-4 text-center text-lg font-bold mb-4 focus:ring-2 focus:ring-red-500 transition-all outline-none">
-      <button onclick="checkAccess()" class="w-full brand-bg text-white font-bold py-4 rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition-all">驗證並進入</button>
-      <p id="login-error" class="text-red-500 text-xs font-bold mt-4 hidden">代碼錯誤，請重新輸入</p>
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-72 text-center">
+      <div class="text-xl font-bold mb-4 brand-text">工業辨識登入</div>
+      <input type="password" id="access-code" placeholder="存取碼" class="w-full bg-gray-100 p-3 rounded-lg text-center mb-4 border-none outline-none">
+      <button onclick="checkAccess()" class="w-full brand-bg text-white py-3 rounded-lg font-bold">進入系統</button>
     </div>
   </div>
 
-  <div id="app" class="locked">
-    <header class="brand-bg" id="header">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:28px;height:28px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;">
-          <svg width="16" height="16" fill="#e2231a" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:bold;color:#fff;line-height:1.1;">工業產品辨識終端</div>
-          <div style="font-size:8px;color:rgba(255,255,255,0.5);letter-spacing:.3px;">VISUAL IDENTIFICATION TERMINAL</div>
-        </div>
+  <div id="layout">
+    <header id="header" class="brand-bg">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 bg-white rounded flex items-center justify-center font-bold brand-text text-sm">W</div>
+        <div class="font-bold text-sm tracking-tight">工業辨識終端</div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;color:#fff;">
-        <span id="clock" style="font-family:monospace;font-size:12px;font-weight:bold;background:rgba(255,255,255,0.1);padding:3px 8px;border-radius:3px;">--:--:--</span>
-        <div style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:bold;">
-          <div id="status-dot"></div>ONLINE
-        </div>
+      <div class="flex items-center gap-4 text-xs font-bold">
+        <span id="clock">00:00:00</span>
+        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>ONLINE</span>
       </div>
     </header>
 
-    <main id="main">
-      <div id="left-col">
-        <div id="camera-card" class="card">
-          <div id="camera-header">
-             <div class="flex items-center gap-2 brand-text font-bold text-xs"><span class="w-1 h-3 brand-bg rounded-full"></span>鏡頭視角</div>
-             <select id="cam-select" class="setting-input w-auto"></select>
+    <div id="main">
+      <div id="cam-col">
+        <div class="card flex-1">
+          <div class="flex justify-between items-center mb-2">
+            <div class="text-xs font-bold flex items-center gap-1"><span class="w-1 h-3 brand-bg"></span>鏡頭視角</div>
+            <select id="cam-sel" class="text-[10px] bg-gray-100 p-1 border-none rounded"></select>
           </div>
-          <div id="video-wrapper">
-             <video id="video" autoplay playsinline muted></video>
-             <div id="scanner-box">
-                <div id="scanner-label">辨識靶區</div>
-                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
-             </div>
+          <div id="video-container">
+            <video id="video" autoplay playsinline muted></video>
+            <div id="scanner-box"></div>
           </div>
-          <button id="capture-btn" onclick="capture()">
-             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-             啟動影像辨識
-          </button>
+          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-2">啟動辨識</button>
         </div>
-        <div id="settings-bar" class="card">
-           <div><div class="setting-label">曝光 (MS)</div><input type="number" value="50" class="setting-input"></div>
-           <div><div class="setting-label">模型</div><select class="setting-input"><option>Gemma V4</option></select></div>
-           <div><div class="setting-label">狀態</div><div class="text-[10px] text-green-600 font-bold bg-green-50 p-1 rounded text-center">READY</div></div>
-           <div><div class="setting-label">模式</div><div class="text-[10px] text-blue-600 font-bold bg-blue-50 p-1 rounded text-center">AUTO</div></div>
+        <div class="card h-14 !flex-row items-center gap-4 px-3">
+          <div class="flex-1"><div class="lbl">曝光度</div><div class="text-xs font-bold">AUTO</div></div>
+          <div class="flex-1"><div class="lbl">模型</div><div class="text-xs font-bold">Gemma 4</div></div>
+          <div class="w-12"><div class="lbl">模式</div><div class="text-xs font-bold text-green-500">PRO</div></div>
         </div>
       </div>
 
-      <div id="right-col">
-        <div id="result-card" class="card">
-           <div class="field-label mb-2">辨識結果分析</div>
-           <div id="preview-wrapper">
-              <img id="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ccc'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3C/svg%3E">
-           </div>
-           <div id="ai-box">
-              <div id="ai-label"><span>AI 預測</span><span id="conf-val">0%</span></div>
-              <div id="ai-result">--</div>
-              <div id="conf-track"><div id="conf-bar"></div></div>
-           </div>
-           <div class="field-label">人工確認 <button onclick="syncAI()" class="brand-text">套用</button></div>
-           <input type="text" id="manual-input" placeholder="...">
-           <div id="status-msg"></div>
-           <button id="save-btn" onclick="saveRecord()">確認並儲存</button>
+      <div id="info-col">
+        <div class="card flex-1">
+          <div class="text-xs font-bold flex items-center gap-1 mb-3"><span class="w-1 h-3 brand-bg"></span>結果分析</div>
+          
+          <div class="lbl">預覽</div>
+          <div id="preview-area">
+            <img id="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eee'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
+          </div>
+
+          <div id="ai-box">
+            <div class="text-[9px] font-bold text-red-400 uppercase text-left mb-1">AI 辨識結果</div>
+            <div id="ai-res-val">--</div>
+          </div>
+
+          <div class="mb-4">
+            <div class="flex justify-between mb-1"><div class="lbl">人工確認</div><button onclick="syncAI()" class="text-[10px] brand-text font-bold">同步</button></div>
+            <input type="text" id="manual-input" class="input-field" placeholder="...">
+          </div>
+
+          <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-2"></div>
+          
+          <button id="save-btn" onclick="saveRecord()" class="btn btn-disabled mt-auto">確認並儲存</button>
         </div>
       </div>
-    </main>
+    </div>
   </div>
 
-  <canvas id="crop-canvas" style="display:none;"></canvas>
+  <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwXon0gyjS6ada2WhgQN1UjiS2vGyYqtu0_F9vG-r87DjEhrvnFa5ZX1P04tr7bqLy2/exec';
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
-    window.addEventListener('load', () => {
-      if (ACCESS_CODE) {
-        document.getElementById('access-code').value = ACCESS_CODE;
-        checkAccess();
-      }
-    });
-
-    async function checkAccess() {
-      const input = document.getElementById('access-code').value;
-      if (!input) return;
-      ACCESS_CODE = input;
-      localStorage.setItem('demo_access_code', input);
-      document.getElementById('login-overlay').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('app').classList.remove('locked');
-        initCameras();
-      }, 500);
+    function checkAccess() {
+      const code = document.getElementById('access-code').value;
+      if (!code) return;
+      ACCESS_CODE = code;
+      localStorage.setItem('demo_access_code', code);
+      document.getElementById('login-overlay').style.display = 'none';
+      initCams();
     }
 
-    async function initCameras() {
+    if (ACCESS_CODE) { document.getElementById('access-code').value = ACCESS_CODE; checkAccess(); }
+
+    async function initCams() {
       try {
         const tmp = await navigator.mediaDevices.getUserMedia({ video: true });
         tmp.getTracks().forEach(t => t.stop());
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cams = devices.filter(d => d.kind === 'videoinput');
-        const sel = document.getElementById('cam-select');
-        sel.innerHTML = cams.map((d,i) => `<option value="${d.deviceId}">${d.label || 'Camera '+i}</option>`).join('');
-        if (cams.length) startStream(cams[0].deviceId);
-      } catch (err) { alert('相機啟動失敗：' + err.message); }
+        const s = document.getElementById('cam-sel');
+        s.innerHTML = cams.map((c,i) => `<option value="${c.deviceId}">${c.label||'Cam '+i}</option>`).join('');
+        if (cams.length) start(cams[0].deviceId);
+      } catch (e) { alert('相機錯誤: '+e.message); }
     }
 
-    async function startStream(id) {
+    async function start(id) {
       if (currentStream) currentStream.getTracks().forEach(t => t.stop());
       currentStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: id } } });
       document.getElementById('video').srcObject = currentStream;
     }
 
-    document.getElementById('cam-select').onchange = (e) => startStream(e.target.value);
-
-    async function callBackend(action, extraData = {}) {
-      try {
-        const payload = { action: action, access_code: ACCESS_CODE, ...extraData };
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.error && data.error.includes('存取碼')) {
-          localStorage.removeItem('demo_access_code');
-          location.reload(); 
-        }
-        return data;
-      } catch (err) {
-        console.error(err);
-        return { success: false, error: '伺服器連線失敗' };
-      }
-    }
+    document.getElementById('cam-sel').onchange = (e) => start(e.target.value);
 
     async function capture() {
-      const v = document.getElementById('video'), box = document.getElementById('scanner-box');
+      const v = document.getElementById('video');
+      const box = document.getElementById('scanner-box');
       const vr = v.getBoundingClientRect(), sr = box.getBoundingClientRect();
-      const sx = v.videoWidth / vr.width, sy = v.videoHeight / vr.height;
-      const cvs = document.getElementById('crop-canvas'), ctx = cvs.getContext('2d');
-      cvs.width = sr.width * sx; cvs.height = sr.height * sy;
-      ctx.drawImage(v, (sr.left - vr.left) * sx, (sr.top - vr.top) * sy, cvs.width, cvs.height, 0, 0, cvs.width, cvs.height);
+      const sx = v.videoWidth/vr.width, sy = v.videoHeight/vr.height;
+      const cvs = document.getElementById('crop-cvs'), ctx = cvs.getContext('2d');
+      cvs.width = sr.width*sx; cvs.height = sr.height*sy;
+      ctx.drawImage(v, (sr.left-vr.left)*sx, (sr.top-vr.top)*sy, cvs.width, cvs.height, 0, 0, cvs.width, cvs.height);
       const b64 = cvs.toDataURL('image/jpeg', 0.85);
       lastB64 = b64.split(',')[1];
       document.getElementById('preview-img').src = b64;
-      document.getElementById('ai-result').innerText = '辨識中...';
-
-      const data = await callBackend('recognize', { imageBase64: lastB64 });
-      if (data.success) {
-        document.getElementById('ai-result').innerText = data.result;
-        document.getElementById('manual-input').value = data.result;
-        document.getElementById('conf-bar').style.width = '98%';
-        document.getElementById('save-btn').classList.add('ready');
+      document.getElementById('ai-res-val').innerText = '...';
+      
+      const res = await call('recognize', { imageBase64: lastB64 });
+      if (res.success) {
+        document.getElementById('ai-res-val').innerText = res.result;
+        document.getElementById('manual-input').value = res.result;
+        document.getElementById('save-btn').className = 'btn btn-red mt-auto';
       } else {
-        document.getElementById('ai-result').innerText = 'ERROR';
-        alert(data.error);
+        document.getElementById('ai-res-val').innerText = 'FAIL';
+        alert(res.error);
       }
     }
 
     async function saveRecord() {
-      const btn = document.getElementById('save-btn');
-      btn.innerText = '儲存中...'; btn.classList.remove('ready');
-      const data = await callBackend('save', {
+      const b = document.getElementById('save-btn');
+      b.innerText = '處理中'; b.className = 'btn btn-disabled mt-auto';
+      const res = await call('save', {
         imageBase64: lastB64,
-        aiResult: document.getElementById('ai-result').innerText,
+        aiResult: document.getElementById('ai-res-val').innerText,
         manualResult: document.getElementById('manual-input').value
       });
-      if (data.success) {
-        const msg = document.getElementById('status-msg');
-        msg.innerText = '✓ 已成功存檔'; msg.className = 'text-green-600 bg-green-50 p-2 rounded-lg text-xs font-bold block';
-        setTimeout(() => msg.classList.add('hidden'), 3000);
-      }
-      btn.innerText = '確認並儲存'; btn.classList.add('ready');
+      if (res.success) showStatus('✓ 已存檔', 'green');
+      b.innerText = '確認並儲存'; b.className = 'btn btn-red mt-auto';
     }
 
-    function syncAI() { document.getElementById('manual-input').value = document.getElementById('ai-result').innerText; }
+    async function call(action, extra) {
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action, access_code: ACCESS_CODE, ...extra })
+        });
+        return await res.json();
+      } catch (e) { return { success: false, error: '伺服器連線失敗' }; }
+    }
+
+    function showStatus(m, c) {
+      const e = document.getElementById('status-msg');
+      e.innerText = m; e.className = `block text-center text-[10px] p-2 rounded mb-2 bg-${c}-50 text-${c}-600 font-bold`;
+      setTimeout(() => e.className = 'hidden', 3000);
+    }
+    function syncAI() { document.getElementById('manual-input').value = document.getElementById('ai-res-val').innerText; }
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('zh-TW', { hour12: false }); }, 1000);
   </script>
 </body>
+
 </html>
