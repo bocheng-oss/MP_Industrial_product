@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
-  <title>工業辨識系統 - 全適應版</title>
+  <title>工業辨識系統 - 旗艦正式版</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -13,55 +13,42 @@
     .brand-bg { background: #e2231a; }
     .brand-text { color: #e2231a; }
     
-    /* 全螢幕鎖定佈局 */
-    #layout { display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden; }
-    #header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; color: #fff; z-index: 50; }
-    #main { flex: 1; display: grid; grid-template-columns: 60% 40%; gap: 12px; padding: 12px; min-height: 0; overflow: hidden; }
+    #layout { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+    #header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; color: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    #main { flex: 1; display: grid; grid-template-columns: 60% 40%; gap: 12px; padding: 12px; min-height: 0; }
     
-    .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); padding: 12px; display: flex; flex-direction: column; min-height: 0; height: 100%; overflow: hidden; }
+    .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 12px; display: flex; flex-direction: column; min-height: 0; }
     
-    /* 左側：攝影機區 */
-    #cam-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; height: 100%; }
-    #video-container { flex: 1; background: #000; position: relative; border-radius: 8px; overflow: hidden; min-height: 0; }
+    /* 左側佈局 */
+    #cam-col { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
+    #video-container { flex: 1; background: #000; position: relative; border-radius: 8px; overflow: hidden; }
     #video { width: 100%; height: 100%; object-fit: contain; }
-    #scanner-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 1px solid rgba(226, 35, 26, 0.4); background: rgba(226, 35, 26, 0.08); z-index: 10; pointer-events: none; }
-    .scan-corner { position: absolute; width: 16px; height: 16px; border-color: #e2231a; border-style: solid; }
-    .tl { top: -1px; left: -1px; border-width: 3px 0 0 3px; }
-    .tr { top: -1px; right: -1px; border-width: 3px 3px 0 0; }
-    .bl { bottom: -1px; left: -1px; border-width: 0 0 3px 3px; }
-    .br { bottom: -1px; right: -1px; border-width: 0 3px 3px 0; }
+    #scanner-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 220px; border: 1px solid rgba(226, 35, 26, 0.4); background: rgba(226, 35, 26, 0.05); z-index: 10; pointer-events: none; }
+    .scan-corner { position: absolute; width: 20px; height: 20px; border-color: #e2231a; border-style: solid; border-width: 0; }
+    .tl { top: -1px; left: -1px; border-width: 4px 0 0 4px; }
+    .tr { top: -1px; right: -1px; border-width: 4px 4px 0 0; }
+    .bl { bottom: -1px; left: -1px; border-width: 0 0 4px 4px; }
+    .br { bottom: -1px; right: -1px; border-width: 0 4px 4px 0; }
     
-    /* 右側：分析區（排除拉霸的核心設定） */
-    #info-col { display: flex; flex-direction: column; min-height: 0; height: 100%; overflow: hidden; }
+    /* 右側佈局 (實現完美比例) */
+    #analysis-card { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
     
-    /* 預覽圖改為 Flex-Grow，自動適應賸餘空間 */
-    #preview-container { 
-      flex: 1; 
-      width: 100%; 
-      background: #f8fafc; 
-      border-radius: 8px; 
-      margin-bottom: 12px; 
-      overflow: hidden; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-      min-height: 80px; /* 保證最矮不會縮到不見 */
-      border: 1px solid #edf2f7;
-    }
+    /* 中央預覽區：自動縮放維持正方形 */
+    #preview-flex { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; margin-bottom: 8px; }
+    #preview-area { height: 100%; aspect-ratio: 1/1; background: #f3f4f6; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
     #preview-img { max-width: 100%; max-height: 100%; object-fit: contain; }
     
-    /* 固定元件不縮放 */
-    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; flex-shrink: 0; }
-    .manual-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; flex-shrink: 0; }
+    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; }
+    .manual-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
     
-    .btn { height: 46px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; border: none; }
+    .btn { height: 50px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: none; cursor: pointer; }
     .btn-red { background: #e2231a; color: #fff; }
-    .btn-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-    .btn-disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; }
+    .btn-gray { background: #f1f5f9; color: #4b5563; border: 1px solid #e2e8f0; }
+    .btn-disabled { background: #f3f4f6; color: #cbd5e1; cursor: not-allowed; }
 
-    .input-field { width: 100%; background: transparent; border: none; font-size: 24px; font-family: monospace; font-weight: bold; outline: none; }
-    .lbl { font-size: 11px; font-weight: bold; color: #e2231a; margin-bottom: 2px; }
-    .lbl-gray { color: #64748b; }
+    .input-field { width: 100%; background: transparent; border: none; font-size: 26px; font-family: monospace; font-weight: bold; outline: none; }
+    .lbl { font-size: 11px; font-weight: bold; color: #e2231a; margin-bottom: 2px; text-transform: uppercase; }
+    .lbl-gray { color: #6b7280; }
 
     #login-overlay { position: fixed; inset: 0; z-index: 1000; background: #e2231a; display: flex; align-items: center; justify-content: center; padding: 20px; }
   </style>
@@ -70,31 +57,31 @@
 <body>
 
   <div id="login-overlay">
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-72 text-center">
-      <div class="text-xl font-bold mb-4 brand-text">工業辨識登入</div>
-      <input type="password" id="access-code" placeholder="存取碼" class="w-full bg-slate-100 p-3 rounded-lg text-center mb-6 outline-none font-bold">
-      <button onclick="checkAccess()" class="w-full brand-bg text-white py-3 rounded-lg font-bold">進入系統</button>
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-80 text-center">
+      <div class="text-2xl font-bold mb-6 brand-text">工業辨識登入</div>
+      <input type="password" id="access-code" placeholder="請輸入存取碼" class="w-full bg-slate-50 p-4 rounded-xl text-center mb-6 outline-none font-bold border border-gray-100">
+      <button onclick="checkAccess()" class="w-full brand-bg text-white py-4 rounded-xl font-bold text-lg">進入系統</button>
     </div>
   </div>
 
   <div id="layout">
     <header id="header" class="brand-bg">
       <div class="flex items-center gap-2">
-        <div class="w-6 h-6 bg-white rounded flex items-center justify-center font-bold brand-text text-xs">W</div>
-        <div class="font-bold text-sm">工業產品辨識終端</div>
+        <div class="w-6 h-6 bg-white rounded flex items-center justify-center font-bold brand-text text-sm">W</div>
+        <div class="font-bold text-sm tracking-tight">工業產品辨識終端</div>
       </div>
-      <div class="flex items-center gap-4 text-xs font-bold">
-        <span id="clock">00:00:00</span>
-        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>ONLINE</span>
+      <div class="flex items-center gap-4 text-xs font-bold uppercase">
+        <span id="clock" class="bg-black/10 px-2.5 py-1 rounded">00:00:00</span>
+        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>System Online</span>
       </div>
     </header>
 
     <div id="main">
       <div id="cam-col">
-        <div class="card">
+        <div class="card flex-1">
           <div class="flex justify-between items-center mb-2">
-            <div class="text-xs font-bold flex items-center gap-2"><span class="w-1.5 h-3.5 brand-bg rounded-sm"></span>鏡頭視角</div>
-            <select id="cam-sel" class="text-[10px] bg-slate-100 p-1 rounded font-bold outline-none"></select>
+            <div class="text-xs font-bold flex items-center gap-2"><span class="w-1.5 h-4 brand-bg rounded-full"></span>鏡頭視角</div>
+            <select id="cam-sel" class="text-[10px] bg-gray-50 px-2 py-1 rounded font-bold border-none outline-none"></select>
           </div>
           <div id="video-container">
             <video id="video" autoplay playsinline muted></video>
@@ -103,27 +90,28 @@
               <div class="scan-corner bl"></div><div class="scan-corner br"></div>
             </div>
           </div>
-          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-2">啟動影像辨識</button>
+          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3 text-lg shadow-sm">啟動影像辨識</button>
         </div>
-        <div class="card !h-12 !min-h-0 !flex-row items-center gap-6 px-6" style="margin-top: 8px;">
-          <div class="flex-1 text-[10px]"><span class="lbl-gray font-bold">曝光：</span><span class="font-bold font-mono">AUTO</span></div>
-          <div class="flex-1 text-[10px]"><span class="lbl-gray font-bold">閥值：</span><span class="font-bold font-mono">0.5</span></div>
-          <div class="flex-1 text-right text-[10px] text-green-600 font-bold">PRO MODE</div>
+        <div class="card !h-12 !flex-row items-center gap-10 px-8">
+          <div class="flex-1"><span class="lbl-gray text-[9px] font-bold">曝光：</span><span class="text-xs font-bold">AUTO</span></div>
+          <div class="flex-1"><span class="lbl-gray text-[9px] font-bold">闊值：</span><span class="text-xs font-bold">0.5</span></div>
+          <div class="flex-1 text-right text-xs font-bold text-green-600 tracking-wider">PRO MODE</div>
         </div>
       </div>
 
       <div id="info-col">
-        <div class="card">
-          <div class="text-sm font-bold flex items-center gap-2 mb-3 brand-text"><span class="w-1.5 h-3.5 brand-bg rounded-sm"></span>分析報告</div>
+        <div id="analysis-card" class="card">
+          <div class="text-base font-bold flex items-center gap-2 mb-3 brand-text"><span class="w-2 h-5 brand-bg rounded-sm"></span>分析報告</div>
           
-          <!-- 此區塊會自動縮放 -->
-          <div id="preview-container">
-            <img id="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eee'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
+          <div id="preview-flex">
+            <div id="preview-area">
+              <img id="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eee'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
+            </div>
           </div>
 
           <div id="ai-box">
             <span class="lbl">AI 辨識編號</span>
-            <div id="ai-res-val" class="font-bold text-2xl text-red-600 font-mono">--</div>
+            <div id="ai-res-val" class="font-bold text-3xl text-red-600 font-mono tracking-tighter">--</div>
           </div>
 
           <div class="manual-box">
@@ -145,7 +133,7 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    // 【重要】請將下方網址替換為您的 Google Apps Script 部署 URL (以 /exec 結尾)
+    // 請確認手動更換下方的 URL
     const API_URL = 'https://script.google.com/macros/s/AKfycbxw9A0k4KZAOakCcx2CnNtcOfXnioR06jGhgIKpcB5-n4yMFKe_X4AT2mSLGLU_28N0/exec'; 
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
@@ -169,7 +157,7 @@
         const s = document.getElementById('cam-sel');
         s.innerHTML = cams.map((c, i) => `<option value="${c.deviceId}">${c.label || '相機 ' + i}</option>`).join('');
         if (cams.length) start(cams[0].deviceId);
-      } catch (e) { alert('相機啟動失敗: ' + e.message); }
+      } catch (e) { alert('設備異常: ' + e.message); }
     }
 
     async function start(id) {
@@ -196,10 +184,7 @@
       if (res.success) {
         document.getElementById('ai-res-val').innerText = res.result;
         document.getElementById('manual-input').value = res.result;
-        document.getElementById('save-btn').className = 'btn btn-red col-span-3';
-      } else {
-        document.getElementById('ai-res-val').innerText = 'ERROR';
-        showStatus('辨識失敗：' + res.error, 'red');
+        document.getElementById('save-btn').className = 'btn btn-red col-span-3 shadow-md';
       }
     }
 
@@ -207,30 +192,25 @@
       const b = document.getElementById('save-btn');
       if (b.classList.contains('btn-disabled')) return;
       const oldTxt = b.innerText;
-      b.innerText = '儲存中...'; b.className = 'btn btn-disabled col-span-3';
+      b.innerText = '處理中...'; b.className = 'btn btn-disabled col-span-3';
       const res = await callBackend('save', {
         imageBase64: lastB64, aiResult: document.getElementById('ai-res-val').innerText, manualResult: document.getElementById('manual-input').value
       });
       if (res.success) {
-        showStatus('✓ 已存檔', 'green');
+        showStatus('✓ 已成功儲存', 'green');
         b.innerText = oldTxt; b.className = 'btn btn-red col-span-3';
       }
     }
 
     async function callBackend(action, extra) {
-      if (API_URL.includes('您的_GAS_WEBAPP')) {
-        return { success: false, error: '尚未填寫 API 網址 (第 141 行)' };
-      }
+      if (API_URL.includes('您的_GAS')) return { success: false, error: '網址未填' };
       try {
         const res = await fetch(API_URL, {
           method: 'POST', headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ action, access_code: ACCESS_CODE, ...extra })
         });
-        const data = await res.json();
-        return data;
-      } catch (e) { 
-        return { success: false, error: '連線被拒或網址無效 (請檢查 GAS 部署是否設為「任何人」)' }; 
-      }
+        return await res.json();
+      } catch (e) { return { success: false, error: '連線錯誤' }; }
     }
 
     function showStatus(m, c) {
