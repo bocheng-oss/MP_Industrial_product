@@ -13,17 +13,19 @@
     body {
       margin: 0;
       padding: 0;
-      height: 100vh; /* 預設 PC 全螢幕 */
-      overflow: hidden; /* 預設 PC 禁用拉霸 */
+      height: 100%;
+      width: 100%;
+      overflow: hidden; /* PC 模式強行鎖死 */
       font-family: 'Noto Sans TC', sans-serif;
       background: #eaedf2;
+      position: fixed; /* 防止任何原因產生的捲動行為 */
     }
 
-    /* RWD 直式排列切換：開啟拉霸與高度自適應 */
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
       html, body {
         height: auto;
         overflow-y: auto;
+        position: relative;
       }
     }
 
@@ -40,9 +42,10 @@
       flex-direction: column;
       height: 100vh;
       width: 100vw;
+      overflow: hidden;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
       #layout { height: auto; }
     }
 
@@ -61,19 +64,19 @@
       flex: 1;
       display: grid;
       grid-template-columns: 3fr 2fr;
-      gap: 16px;
-      padding: 16px 24px;
-      min-height: 0; /* 重要：防止子元素撐開 Grid 導致拉霸 */
-      width: 100vw;
+      gap: 12px;
+      padding: 12px 16px;
+      height: calc(100vh - 44px); /* 扣除 Header 高度，剩餘鎖死 */
+      box-sizing: border-box;
+      min-height: 0;
     }
 
-    /* 直式作業優化 */
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
       #main {
         display: flex;
         flex-direction: column;
+        height: auto;
         padding: 12px;
-        flex: none;
       }
       #cam-card { order: 1; }
       #info-col { order: 2; }
@@ -87,6 +90,7 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
+      flex-basis: 0;
     }
 
     /* 左側佈局 */
@@ -166,22 +170,24 @@
       overflow: hidden;
     }
 
-    /* 中央預覽區：優化 PC 上的拉霸問題，強迫在固定空間內縮放 */
+    /* 中央預覽區：真正的 PC 不溢出核心 */
     #preview-flex {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 12px;
-      min-height: 0; /* 允許縮小以防止頂開版面 */
+      margin-bottom: 8px;
+      min-height: 0;
+      max-height: 45vh; /* 強制：圖片最高不准超過螢幕高度的 45% */
+      overflow: hidden;
     }
 
     #preview-area {
-      height: 100%; /* 回歸受控高度 */
-      aspect-ratio: 1/1;
+      height: 100%;
+      width: 100%;
+      max-width: 100%;
       background: #f3f4f6;
       border-radius: 8px;
-      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -189,15 +195,17 @@
     }
 
     #preview-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* 改為 contain 確保不論高矮都能看全 */
     }
 
-    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; overflow: hidden; }
-    .manual-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
-    
-    #model-info-card { flex-shrink: 0; }
+    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; flex-shrink: 0; }
+    .manual-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; flex-shrink: 0; }
+
+    #model-info-card {
+      flex-shrink: 0;
+    }
 
     .btn {
       height: 50px;
@@ -289,15 +297,15 @@
 
     <div id="main">
       <div id="cam-col">
-        <div id="cam-card" class="card flex-1">
-          <div class="flex justify-between items-center mb-2">
+        <div id="cam-card" class="card flex-1 min-h-0">
+          <div class="flex justify-between items-center mb-1">
             <div class="text-xs font-bold flex items-center gap-2"><span
                 class="w-1.5 h-4 brand-bg rounded-full"></span>鏡頭視角</div>
             <select id="cam-sel"
               class="text-[10px] bg-gray-50 px-2 py-1 rounded font-bold border-none outline-none"></select>
           </div>
-          <div id="video-container">
-            <video id="video" autoplay playsinline muted></video>
+          <div id="video-container" class="flex-1 min-h-0 max-h-[45vh] bg-black rounded-lg overflow-hidden relative">
+            <video id="video" class="w-full h-full object-contain" autoplay playsinline muted></video>
             <div id="scanner-box">
               <div class="scan-corner tl"></div>
               <div class="scan-corner tr"></div>
@@ -305,14 +313,14 @@
               <div class="scan-corner br"></div>
             </div>
           </div>
-          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3 text-lg shadow-sm">啟動影像辨識</button>
+          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-2 text-lg shadow-sm">啟動影像辨識</button>
         </div>
-        <div id="model-info-card" class="card !h-14 !min-h-0 !flex-row items-center gap-10 px-8">
-          <div class="flex-1"><span class="lbl-gray text-[9px] font-bold">曝光：</span><span
+        <div id="model-info-card" class="card !h-12 !min-h-0 !flex-row items-center gap-8 px-6 mt-2">
+          <div class="flex-1 truncate"><span class="lbl-gray text-[9px] font-bold">曝光：</span><span
               class="text-xs font-bold font-mono">AUTO</span></div>
-          <div class="flex-1"><span class="lbl-gray text-[9px] font-bold">閾值：</span><span
+          <div class="flex-1 truncate"><span class="lbl-gray text-[9px] font-bold">閾值：</span><span
               class="text-xs font-bold font-mono">0.5</span></div>
-          <div class="flex-1 text-right text-xs font-bold text-green-600 tracking-wider">PRO MODE</div>
+          <div class="text-right text-[10px] font-bold text-green-600 tracking-wider">PRO MODE</div>
         </div>
       </div>
 
@@ -332,7 +340,8 @@
           <div id="ai-box">
             <span class="lbl">AI 辨識編號</span>
             <!-- 加入 truncate (單行省略號) 避免 AI 回傳超長錯誤訊息把版面撐爆 -->
-            <div id="ai-res-val" class="font-bold text-3xl text-red-600 font-mono tracking-tighter truncate w-full" title="辨識結果">--</div>
+            <div id="ai-res-val" class="font-bold text-3xl text-red-600 font-mono tracking-tighter truncate w-full"
+              title="辨識結果">--</div>
           </div>
 
           <div class="manual-box">
