@@ -9,39 +9,197 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    html, body { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; background: #f0f2f5; }
-    .brand-bg { background: #e2231a; }
-    .brand-text { color: #e2231a; }
-    .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 10px; display: flex; flex-direction: column; min-height: 0; }
-    
-    /* Login Overlay */
-    #login-overlay { position: fixed; inset: 0; z-index: 999; background: #e2231a; display: flex; items-center: center; justify-content: center; padding: 20px; }
-    
-    /* Layout */
-    #layout { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
-    #header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; flex-shrink: 0; color: #fff; }
-    #main { flex: 1; display: grid; grid-template-columns: 1fr 320px; gap: 8px; padding: 8px; min-height: 0; }
-    
-    /* Left Column */
-    #cam-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-    #video-container { flex: 1; background: #000; position: relative; border-radius: 6px; overflow: hidden; }
-    #video { width: 100%; height: 100%; object-fit: contain; }
-    #scanner-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 100px; border: 2px solid #e2231a; z-index: 10; pointer-events: none; }
-    
-    /* Right Column */
-    #info-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; }
-    #preview-area { height: 70px; background: #f8f9fa; border: 1px dashed #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-    #preview-img { max-height: 100%; max-width: 100%; }
-    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 6px; padding: 8px; margin-bottom: 8px; text-align: center; }
-    #ai-res-val { font-size: 26px; font-weight: bold; color: #cf1322; font-family: monospace; }
-    
-    .btn { height: 44px; border-radius: 6px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all .2s; cursor: pointer; border: none; }
-    .btn-red { background: #e2231a; color: #fff; width: 100%; }
-    .btn-red:active { filter: brightness(0.9); }
-    .btn-disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; width: 100%; }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f0f2f5;
+    }
 
-    .input-field { background: #f5f5f5; border: 1px solid #d9d9d9; border-radius: 4px; padding: 6px 10px; font-size: 16px; font-family: monospace; font-weight: bold; width: 100%; outline: none; }
-    .lbl { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; margin-bottom: 3px; }
+    .brand-bg {
+      background: #e2231a;
+    }
+
+    .brand-text {
+      color: #e2231a;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Login Overlay */
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: #e2231a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Layout */
+    #layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #header {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    #main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 8px;
+      padding: 8px;
+      min-height: 0;
+    }
+
+    /* Left Column */
+    #cam-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    #video-container {
+      flex: 1;
+      background: #000;
+      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #scanner-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 100px;
+      border: 2px solid #e2231a;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Right Column */
+    #info-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    #preview-area {
+      height: 70px;
+      background: #f8f9fa;
+      border: 1px dashed #ddd;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    #preview-img {
+      max-height: 100%;
+      max-width: 100%;
+    }
+
+    #ai-box {
+      background: #fff1f0;
+      border: 1px solid #ffa39e;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    #ai-res-val {
+      font-size: 26px;
+      font-weight: bold;
+      color: #cf1322;
+      font-family: monospace;
+    }
+
+    .btn {
+      height: 44px;
+      border-radius: 6px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-red {
+      background: #e2231a;
+      color: #fff;
+      width: 100%;
+    }
+
+    .btn-red:active {
+      filter: brightness(0.9);
+    }
+
+    .btn-disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+      width: 100%;
+    }
+
+    .input-field {
+      background: #f5f5f5;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 16px;
+      font-family: monospace;
+      font-weight: bold;
+      width: 100%;
+      outline: none;
+    }
+
+    .lbl {
+      font-size: 10px;
+      font-weight: bold;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
   </style>
 </head>
 
@@ -51,7 +209,8 @@
   <div id="login-overlay">
     <div class="bg-white p-6 rounded-2xl shadow-xl w-72 text-center">
       <div class="text-xl font-bold mb-4 brand-text">工業辨識登入</div>
-      <input type="password" id="access-code" placeholder="存取碼" class="w-full bg-gray-100 p-3 rounded-lg text-center mb-4 border-none outline-none">
+      <input type="password" id="access-code" placeholder="存取碼"
+        class="w-full bg-gray-100 p-3 rounded-lg text-center mb-4 border-none outline-none">
       <button onclick="checkAccess()" class="w-full brand-bg text-white py-3 rounded-lg font-bold">進入系統</button>
     </div>
   </div>
@@ -82,19 +241,29 @@
           <button id="capture-btn" onclick="capture()" class="btn btn-red mt-2">啟動辨識</button>
         </div>
         <div class="card h-14 !flex-row items-center gap-4 px-3">
-          <div class="flex-1"><div class="lbl">曝光度</div><div class="text-xs font-bold">AUTO</div></div>
-          <div class="flex-1"><div class="lbl">模型</div><div class="text-xs font-bold">Gemma 4</div></div>
-          <div class="w-12"><div class="lbl">模式</div><div class="text-xs font-bold text-green-500">PRO</div></div>
+          <div class="flex-1">
+            <div class="lbl">曝光度</div>
+            <div class="text-xs font-bold">AUTO</div>
+          </div>
+          <div class="flex-1">
+            <div class="lbl">模型</div>
+            <div class="text-xs font-bold">Gemma 4</div>
+          </div>
+          <div class="w-12">
+            <div class="lbl">模式</div>
+            <div class="text-xs font-bold text-green-500">PRO</div>
+          </div>
         </div>
       </div>
 
       <div id="info-col">
         <div class="card flex-1">
           <div class="text-xs font-bold flex items-center gap-1 mb-3"><span class="w-1 h-3 brand-bg"></span>結果分析</div>
-          
+
           <div class="lbl">預覽</div>
           <div id="preview-area">
-            <img id="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eee'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
+            <img id="preview-img"
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eee'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
           </div>
 
           <div id="ai-box">
@@ -103,12 +272,14 @@
           </div>
 
           <div class="mb-4">
-            <div class="flex justify-between mb-1"><div class="lbl">人工確認</div><button onclick="syncAI()" class="text-[10px] brand-text font-bold">同步</button></div>
+            <div class="flex justify-between mb-1">
+              <div class="lbl">人工確認</div><button onclick="syncAI()" class="text-[10px] brand-text font-bold">同步</button>
+            </div>
             <input type="text" id="manual-input" class="input-field" placeholder="...">
           </div>
 
           <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-2"></div>
-          
+
           <button id="save-btn" onclick="saveRecord()" class="btn btn-disabled mt-auto">確認並儲存</button>
         </div>
       </div>
@@ -118,7 +289,7 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwXon0gyjS6ada2WhgQN1UjiS2vGyYqtu0_F9vG-r87DjEhrvnFa5ZX1P04tr7bqLy2/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyruSzohil0jLMP4TV1wc1hqQ29saBiz__GlUwwwgoMtROLJZrqiDHRlYC7iTGDrjhz/exec';
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
@@ -140,9 +311,9 @@
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cams = devices.filter(d => d.kind === 'videoinput');
         const s = document.getElementById('cam-sel');
-        s.innerHTML = cams.map((c,i) => `<option value="${c.deviceId}">${c.label||'Cam '+i}</option>`).join('');
+        s.innerHTML = cams.map((c, i) => `<option value="${c.deviceId}">${c.label || 'Cam ' + i}</option>`).join('');
         if (cams.length) start(cams[0].deviceId);
-      } catch (e) { alert('相機錯誤: '+e.message); }
+      } catch (e) { alert('相機錯誤: ' + e.message); }
     }
 
     async function start(id) {
@@ -157,15 +328,15 @@
       const v = document.getElementById('video');
       const box = document.getElementById('scanner-box');
       const vr = v.getBoundingClientRect(), sr = box.getBoundingClientRect();
-      const sx = v.videoWidth/vr.width, sy = v.videoHeight/vr.height;
+      const sx = v.videoWidth / vr.width, sy = v.videoHeight / vr.height;
       const cvs = document.getElementById('crop-cvs'), ctx = cvs.getContext('2d');
-      cvs.width = sr.width*sx; cvs.height = sr.height*sy;
-      ctx.drawImage(v, (sr.left-vr.left)*sx, (sr.top-vr.top)*sy, cvs.width, cvs.height, 0, 0, cvs.width, cvs.height);
+      cvs.width = sr.width * sx; cvs.height = sr.height * sy;
+      ctx.drawImage(v, (sr.left - vr.left) * sx, (sr.top - vr.top) * sy, cvs.width, cvs.height, 0, 0, cvs.width, cvs.height);
       const b64 = cvs.toDataURL('image/jpeg', 0.85);
       lastB64 = b64.split(',')[1];
       document.getElementById('preview-img').src = b64;
       document.getElementById('ai-res-val').innerText = '...';
-      
+
       const res = await call('recognize', { imageBase64: lastB64 });
       if (res.success) {
         document.getElementById('ai-res-val').innerText = res.result;
