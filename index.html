@@ -351,15 +351,16 @@
     </header>
 
     <div id="main">
-      <div id="cam-col">
-        <div id="cam-card" class="card flex-[3] min-h-0">
-          <div class="flex justify-between items-center mb-1">
+      <!-- 左側欄位 -->
+      <div id="cam-col" class="flex flex-col h-full">
+        <div id="cam-card" class="card h-full min-h-0">
+          <div class="flex justify-between items-center mb-1 flex-none">
             <div class="text-[11px] font-bold flex items-center gap-2"><span
                 class="w-1.5 h-4 brand-bg rounded-full"></span>鏡頭視角</div>
             <select id="cam-sel"
               class="text-[10px] bg-gray-50 px-2 py-1 rounded font-bold border-none outline-none"></select>
           </div>
-          <div id="video-container" class="flex-1 min-h-0 max-h-[65vh] bg-black rounded-lg overflow-hidden relative">
+          <div id="video-container" class="flex-1 min-h-0 bg-black rounded-lg overflow-hidden relative">
             <video id="video" class="w-full h-full object-contain" autoplay playsinline muted></video>
             <div id="scanner-box">
               <div class="scan-corner tl"></div>
@@ -368,38 +369,23 @@
               <div class="scan-corner br"></div>
             </div>
           </div>
-          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3 text-lg shadow-sm">啟動影像辨識</button>
+          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3 text-lg shadow-sm flex-none">啟動影像辨識</button>
         </div>
-        <!-- 佔位符以推開底部距離 -->
-        <div class="h-4 flex-none"></div>
       </div>
 
-      <div id="info-col" class="flex flex-col">
-        <div id="analysis-card" class="card flex-[3]">
-          <div class="text-xs font-bold flex items-center gap-2 mb-3 brand-text"><span
+      <!-- 右側欄位 -->
+      <div id="info-col" class="flex flex-col h-full">
+        <div id="analysis-card" class="card h-full min-h-0 flex flex-col">
+          <div class="text-xs font-bold flex items-center gap-2 mb-3 brand-text flex-none"><span
               class="w-1.5 h-4 brand-bg rounded-sm"></span>辨識結果</div>
-
-          <div id="preview-flex">
-            <div id="preview-area">
-              <img id="preview-img"
+          
+          <div id="preview-flex" class="flex-1 min-h-0">
+            <div id="preview-area" class="h-full">
+              <img id="preview-img" class="h-full w-full object-contain"
                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' fill='%23eee'%3E%3Crect width='1000' height='1000'/%3E%3C/svg%3E">
             </div>
           </div>
 
-          <div id="ai-box">
-            <span class="lbl">AI 辨識編號</span>
-            <div id="ai-res-val" class="font-bold text-3xl text-red-600 font-mono tracking-tighter truncate w-full"
-              title="辨識結果">--</div>
-          </div>
-
-          <div class="manual-box">
-            <span class="lbl-gray text-[9px] font-bold">人工核對數據</span>
-            <input type="text" id="manual-input" class="input-field" placeholder="...">
-          </div>
-
-          <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-2 font-bold"></div>
-
-          <div class="grid grid-cols-4 gap-2">
             <button onclick="copyToClipboard()" class="btn btn-gray col-span-1">複製</button>
             <button id="save-btn" onclick="saveRecord()" class="btn btn-disabled col-span-3">儲存紀錄</button>
           </div>
