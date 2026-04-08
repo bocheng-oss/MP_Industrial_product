@@ -5,33 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
-  <title>工業辨識系統 - 旗艦版</title>
+  <title>工業辨識系統 - 進階版</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    html, body { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; background: #f0f2f5; }
+    html, body { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; background: #eaedf2; }
     .brand-bg { background: #e2231a; }
     .brand-text { color: #e2231a; }
-    .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 12px; display: flex; flex-direction: column; min-height: 0; }
+    .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 12px; display: flex; flex-direction: column; min-height: 0; }
     
-    /* Login Overlay */
     #login-overlay { position: fixed; inset: 0; z-index: 999; background: #e2231a; display: flex; align-items: center; justify-content: center; padding: 20px; }
     
-    /* Layout */
     #layout { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
     #header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; color: #fff; }
-    #main { 
-      flex: 1; 
-      display: grid; 
-      grid-template-columns: 62% 38%; 
-      gap: 16px; 
-      padding: 16px; 
-      min-height: 0; 
-      overflow: hidden;
-    }
+    #main { flex: 1; display: grid; grid-template-columns: 60% 40%; gap: 12px; padding: 12px; min-height: 0; }
     
-    /* Left Column */
-    #cam-col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+    #cam-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
     #video-container { flex: 1; background: #000; position: relative; border-radius: 8px; overflow: hidden; }
     #video { width: 100%; height: 100%; object-fit: contain; }
     
@@ -39,8 +28,8 @@
       position: absolute; top: 50%; left: 50%; 
       transform: translate(-50%, -50%); 
       width: 210px; height: 210px; 
-      border: 1px solid rgba(226, 35, 26, 0.3); 
-      background: rgba(226, 35, 26, 0.05);
+      border: 1px solid rgba(226, 35, 26, 0.4); 
+      background: rgba(226, 35, 26, 0.08);
       z-index: 10; pointer-events: none; 
     }
     .scan-corner { position: absolute; width: 20px; height: 20px; border-color: #e2231a; border-style: solid; }
@@ -49,53 +38,55 @@
     .bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; }
     .br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; }
     
-    /* Right Column (Analysis) */
-    #info-col { display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 360px; }
-    #preview-area { 
-      width: 100%; aspect-ratio: 1/1; 
-      background: #f0f0f0; 
+    #info-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; min-width: 360px; }
+    
+    /* 改良型預覽區 - 限制高度防止推擠 */
+    #preview-container { 
+      width: 100%; 
+      flex: 1; 
+      max-height: 38vh; /* 魔法參數：限制在各螢幕一半以下 */
+      aspect-ratio: 1/1;
+      background: #f1f3f5; 
       border-radius: 12px; 
-      display: flex; align-items: center; justify-content: center; 
-      margin-bottom: 12px; 
+      margin: 0 auto 12px;
       overflow: hidden;
+      position: relative;
     }
     #preview-img { width: 100%; height: 100%; object-fit: cover; }
     
-    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
-    .manual-box { background: #f5f5f5; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+    .manual-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
     
-    .btn { height: 48px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: all .2s; border: none; cursor: pointer; }
+    .btn { height: 48px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
     .btn-red { background: #e2231a; color: #fff; }
-    .btn-red:active { filter: brightness(0.9); }
-    .btn-gray { background: #e5e7eb; color: #4b5563; }
-    .btn-gray:active { background: #d1d5db; }
-    .btn-disabled { background: #f3f4f6; color: #d1d5db; cursor: not-allowed; }
+    .btn-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; }
 
     .input-field { width: 100%; background: transparent; border: none; font-size: 24px; font-family: monospace; font-weight: bold; outline: none; }
-    .lbl { font-size: 11px; font-weight: bold; color: #e2231a; margin-bottom: 4px; display: block; }
-    .lbl-gray { color: #666; }
+    .lbl { font-size: 11px; font-weight: bold; color: #e2231a; margin-bottom: 2px; }
+    .lbl-gray { color: #64748b; }
   </style>
 </head>
 
 <body>
 
   <div id="login-overlay">
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-72 text-center">
-      <div class="text-xl font-bold mb-4 brand-text">工業辨識登入</div>
-      <input type="password" id="access-code" placeholder="存取碼" class="w-full bg-gray-100 p-3 rounded-lg text-center mb-4 outline-none">
-      <button onclick="checkAccess()" class="w-full brand-bg text-white py-3 rounded-lg font-bold">進入系統</button>
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-80 text-center">
+      <div class="text-2xl font-bold mb-6 brand-text">工業辨識登入</div>
+      <input type="password" id="access-code" placeholder="請輸入存取碼" class="w-full bg-slate-100 p-4 rounded-xl text-center mb-6 outline-none font-bold">
+      <button onclick="checkAccess()" class="w-full brand-bg text-white py-4 rounded-xl font-bold text-lg">進入系統</button>
     </div>
   </div>
 
   <div id="layout">
     <header id="header" class="brand-bg">
-      <div class="flex items-center gap-2">
-        <div class="w-6 h-6 bg-white rounded flex items-center justify-center font-bold brand-text text-sm">W</div>
-        <div class="font-bold text-sm tracking-tight">工業辨識終端</div>
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 bg-white rounded-lg flex items-center justify-center font-bold brand-text text-sm">W</div>
+        <div class="font-bold text-lg tracking-normal">工業產品辨識終端</div>
       </div>
-      <div class="flex items-center gap-4 text-xs font-bold">
-        <span id="clock">00:00:00</span>
-        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>ONLINE</span>
+      <div class="flex items-center gap-6 text-sm font-bold">
+        <span id="clock" class="bg-black/10 px-3 py-1 rounded">00:00:00</span>
+        <span class="flex items-center gap-2"><span class="w-2 h-2 bg-green-400 rounded-full"></span>ONLINE</span>
       </div>
     </header>
 
@@ -103,8 +94,8 @@
       <div id="cam-col">
         <div class="card flex-1">
           <div class="flex justify-between items-center mb-2">
-            <div class="text-xs font-bold flex items-center gap-1"><span class="w-1 h-3 brand-bg"></span>鏡頭視角</div>
-            <select id="cam-sel" class="text-[10px] bg-gray-100 p-1 rounded"></select>
+            <div class="text-xs font-bold flex items-center gap-2"><span class="w-1.5 h-4 brand-bg rounded-full"></span>鏡頭視角</div>
+            <select id="cam-sel" class="text-xs bg-slate-100 px-3 py-1 border-none rounded-lg font-bold outline-none"></select>
           </div>
           <div id="video-container">
             <video id="video" autoplay playsinline muted></video>
@@ -113,20 +104,20 @@
               <div class="scan-corner bl"></div><div class="scan-corner br"></div>
             </div>
           </div>
-          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3">啟動辨識</button>
+          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3 text-lg shadow-md">啟動影像辨識</button>
         </div>
-        <div class="card h-14 !flex-row items-center gap-5 px-5">
-          <div class="flex-1"><div class="text-[9px] font-bold text-gray-400">曝光時間</div><div class="text-xs font-bold">AUTO / 50ms</div></div>
-          <div class="flex-1"><div class="text-[9px] font-bold text-gray-400">模型閥值</div><div class="text-xs font-bold">0.5</div></div>
-          <div class="w-12 text-right"><div class="text-[9px] font-bold text-gray-400">模式</div><div class="text-xs font-bold text-green-500">PRO</div></div>
+        <div class="card h-14 !flex-row items-center gap-8 px-8">
+          <div class="flex-1"><div class="lbl-gray text-[9px] font-bold">曝光時間</div><div class="text-xs font-bold text-slate-700">AUTO</div></div>
+          <div class="flex-1"><div class="lbl-gray text-[9px] font-bold">模型閥值</div><div class="text-xs font-bold text-slate-700">0.5</div></div>
+          <div class="w-16 text-right"><div class="lbl-gray text-[9px] font-bold">模式</div><div class="text-xs font-bold text-green-600">PRO</div></div>
         </div>
       </div>
 
       <div id="info-col">
         <div class="card flex-1">
-          <div class="text-sm font-bold flex items-center gap-2 mb-4 brand-text"><span class="w-1.5 h-4 brand-bg rounded-sm"></span>結果分析</div>
+          <div class="text-base font-bold flex items-center gap-2 mb-3 brand-text"><span class="w-2 h-5 brand-bg rounded-sm"></span>識別結果分析</div>
           
-          <div id="preview-area">
+          <div id="preview-container">
             <img id="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ccc'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
           </div>
 
@@ -136,15 +127,15 @@
           </div>
 
           <div class="manual-box">
-            <span class="lbl lbl-gray font-bold">人工確認</span>
+            <span class="lbl-gray text-[10px] font-bold">人工核對數據</span>
             <input type="text" id="manual-input" class="input-field" placeholder="...">
           </div>
 
-          <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-2"></div>
+          <div id="status-msg" class="hidden text-center text-xs p-2 rounded mb-2"></div>
 
-          <div class="mt-auto grid grid-cols-4 gap-2">
+          <div class="mt-auto grid grid-cols-4 gap-2 flex-shrink-0">
             <button onclick="copyToClipboard()" class="btn btn-gray col-span-1">複製</button>
-            <button id="save-btn" onclick="saveRecord()" class="btn btn-disabled col-span-3">確認並儲存</button>
+            <button id="save-btn" onclick="saveRecord()" class="btn btn-disabled col-span-3">確認並儲存結果</button>
           </div>
         </div>
       </div>
@@ -154,7 +145,7 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyt1CIHD__S6Fo3wrNeLDuffZemkBivKcFeWpi2A-5A5n1-nwWBItKcYh4E5n-1RBxY/exec';
+    const API_URL = '您的_GAS_WEBAPP_DEPLOY_ID_EXEC_網址'; // 改為您的正式網址
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
@@ -175,9 +166,9 @@
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cams = devices.filter(d => d.kind === 'videoinput');
         const s = document.getElementById('cam-sel');
-        s.innerHTML = cams.map((c,i) => `<option value="${c.deviceId}">${c.label||'Cam '+i}</option>`).join('');
+        s.innerHTML = cams.map((c,i) => `<option value="${c.deviceId}">${c.label||'相機 '+i}</option>`).join('');
         if (cams.length) start(cams[0].deviceId);
-      } catch (e) { alert('相機錯誤: '+e.message); }
+      } catch (e) { alert('設備初始化錯誤: '+e.message); }
     }
 
     async function start(id) {
@@ -196,28 +187,31 @@
       const cvs = document.getElementById('crop-cvs'), ctx = cvs.getContext('2d');
       cvs.width = sr.width*sx; cvs.height = sr.height*sy;
       ctx.drawImage(v, (sr.left-vr.left)*sx, (sr.top-vr.top)*sy, cvs.width, cvs.height, 0, 0, cvs.width, cvs.height);
-      const b64 = cvs.toDataURL('image/jpeg', 0.85);
+      const b64 = cvs.toDataURL('image/jpeg', 0.9);
       lastB64 = b64.split(',')[1];
       document.getElementById('preview-img').src = b64;
-      document.getElementById('ai-res-val').innerText = '...';
+      document.getElementById('ai-res-val').innerText = '分析中...';
       const res = await callBackend('recognize', { imageBase64: lastB64 });
       if (res.success) {
         document.getElementById('ai-res-val').innerText = res.result;
         document.getElementById('manual-input').value = res.result;
-        document.getElementById('save-btn').className = 'btn btn-red col-span-3';
+        document.getElementById('save-btn').className = 'btn btn-red col-span-3 shadow-md';
+      } else {
+        document.getElementById('ai-res-val').innerText = 'ERROR';
+        showStatus('辨識失敗：' + res.error, 'red');
       }
     }
 
     async function saveRecord() {
       const b = document.getElementById('save-btn');
       if (b.classList.contains('btn-disabled')) return;
-      b.innerText = '處理中...'; b.className = 'btn btn-disabled col-span-3';
+      b.innerText = '儲存中...'; b.className = 'btn btn-disabled col-span-3';
       const res = await callBackend('save', {
         imageBase64: lastB64, aiResult: document.getElementById('ai-res-val').innerText, manualResult: document.getElementById('manual-input').value
       });
       if (res.success) {
-        showStatus('✓ 已存檔', 'green');
-        b.innerText = '確認並儲存'; b.className = 'btn btn-red col-span-3';
+        showStatus('✓ 數據已成功存入系統', 'green');
+        b.innerText = '確認並儲存結果'; b.className = 'btn btn-red col-span-3 shadow-md';
       }
     }
 
@@ -229,20 +223,21 @@
           body: JSON.stringify({ action, access_code: ACCESS_CODE, ...extra })
         });
         return await res.json();
-      } catch (e) { return { success: false, error: '伺服器連線失敗' }; }
+      } catch (e) { return { success: false, error: '後端連線失敗' }; }
     }
 
     function showStatus(m, c) {
       const e = document.getElementById('status-msg');
-      e.innerText = m; e.className = `block text-center text-[10px] p-2 rounded mb-2 bg-${c}-50 text-${c}-600 font-bold`;
+      e.innerText = m; e.className = `block text-center text-xs p-2 rounded mb-2 bg-${c}-50 text-${c}-600 font-bold`;
       setTimeout(() => e.className = 'hidden', 3000);
     }
+    
     function copyToClipboard() {
       const input = document.getElementById('manual-input');
       if (!input.value) return;
-      input.select();
-      document.execCommand('copy');
-      showStatus('✓ 已複製', 'green');
+      navigator.clipboard.writeText(input.value).then(() => {
+        showStatus('✓ 已複製', 'green');
+      });
     }
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('zh-TW', { hour12: false }); }, 1000);
   </script>
