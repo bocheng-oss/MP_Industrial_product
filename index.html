@@ -57,77 +57,41 @@
       width: 100vw;
     }
 
-    #header {
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      flex-shrink: 0;
-      color: #fff;
-    }
-
-    #main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 8px;
-      padding: 8px;
-      min-height: 0;
-    }
-
+    #header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; flex-shrink: 0; color: #fff; }
+    #main { flex: 1; display: grid; grid-template-columns: 5fr 3fr; gap: 12px; padding: 12px; min-height: 0; }
+    
     /* Left Column */
-    #cam-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-    }
+    #cam-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
 
-    #video-container {
-      flex: 1;
-      background: #000;
-      position: relative;
-      border-radius: 6px;
-      overflow: hidden;
+    #video-container { flex: 1; background: #000; position: relative; border-radius: 6px; overflow: hidden; }
+    #video { width: 100%; height: 100%; object-fit: contain; }
+    
+    /* 正方形且具有設計感的靶區 */
+    #scanner-box { 
+      position: absolute; top: 50%; left: 50%; 
+      transform: translate(-50%, -50%); 
+      width: 210px; height: 210px; 
+      border: 1px solid rgba(226, 35, 26, 0.3); 
+      background: rgba(226, 35, 26, 0.05);
+      z-index: 10; pointer-events: none; 
     }
-
-    #video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    #scanner-box {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 200px;
-      height: 100px;
-      border: 2px solid #e2231a;
-      z-index: 10;
-      pointer-events: none;
-    }
-
+    .scan-corner { position: absolute; width: 20px; height: 20px; border-color: #e2231a; border-style: solid; }
+    .tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; }
+    .tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; }
+    .bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; }
+    .br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; }
+    
     /* Right Column */
-    #info-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-      overflow-y: auto;
-    }
-
-    #preview-area {
-      height: 70px;
-      background: #f8f9fa;
-      border: 1px dashed #ddd;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
+    #info-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto; }
+    #preview-area { 
+      width: 220px; height: 220px; 
+      background: #f8f9fa; 
+      border: 3px solid #eee; 
+      border-radius: 12px; 
+      display: flex; align-items: center; justify-content: center; 
+      margin: 10px auto 20px; 
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
 
     #preview-img {
@@ -236,20 +200,25 @@
           </div>
           <div id="video-container">
             <video id="video" autoplay playsinline muted></video>
-            <div id="scanner-box"></div>
+            <div id="scanner-box">
+               <div class="scan-corner tl"></div>
+               <div class="scan-corner tr"></div>
+               <div class="scan-corner bl"></div>
+               <div class="scan-corner br"></div>
+            </div>
           </div>
           <button id="capture-btn" onclick="capture()" class="btn btn-red mt-2">啟動辨識</button>
         </div>
-        <div class="card h-14 !flex-row items-center gap-4 px-3">
+        <div class="card h-14 !flex-row items-center gap-4 px-4 shadow-sm">
           <div class="flex-1">
-            <div class="lbl">曝光度</div>
-            <div class="text-xs font-bold">AUTO</div>
+            <div class="lbl">曝光時間</div>
+            <div class="text-xs font-bold">AUTO / 50ms</div>
           </div>
           <div class="flex-1">
-            <div class="lbl">模型</div>
-            <div class="text-xs font-bold">Gemma 4</div>
+            <div class="lbl">模型閥值</div>
+            <div class="text-xs font-bold">0.5</div>
           </div>
-          <div class="w-12">
+          <div class="w-12 text-right">
             <div class="lbl">模式</div>
             <div class="text-xs font-bold text-green-500">PRO</div>
           </div>
@@ -257,30 +226,33 @@
       </div>
 
       <div id="info-col">
-        <div class="card flex-1">
-          <div class="text-xs font-bold flex items-center gap-1 mb-3"><span class="w-1 h-3 brand-bg"></span>結果分析</div>
-
-          <div class="lbl">預覽</div>
+        <div class="card flex-1 p-6">
+          <div class="text-sm font-bold flex items-center gap-2 mb-4 brand-text"><span class="w-1.5 h-4 brand-bg rounded-sm"></span>結果分析</div>
+          
+          <div class="lbl text-center mb-1">影像放大預覽</div>
           <div id="preview-area">
-            <img id="preview-img"
-              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eee'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
+            <img id="preview-img" style="width:100%;height:100%;object-fit:cover;" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23eee'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E">
           </div>
 
-          <div id="ai-box">
-            <div class="text-[9px] font-bold text-red-400 uppercase text-left mb-1">AI 辨識結果</div>
-            <div id="ai-res-val">--</div>
+          <div id="ai-box" class="mb-6">
+            <div class="flex justify-between items-center mb-1"><div class="text-[9px] font-bold text-red-400 uppercase">AI 辨識結果</div><span class="text-[9px] text-gray-400">97% Match</span></div>
+            <div id="ai-res-val" class="py-2">--</div>
           </div>
 
-          <div class="mb-4">
+          <div class="mb-6">
             <div class="flex justify-between mb-1">
-              <div class="lbl">人工確認</div><button onclick="syncAI()" class="text-[10px] brand-text font-bold">同步</button>
+              <div class="lbl">人工確認</div>
+              <div class="flex gap-3">
+                <button onclick="copyToClipboard()" class="text-[10px] brand-text font-bold">密碼複製</button>
+                <button onclick="syncAI()" class="text-[10px] brand-text font-bold">同步結果</button>
+              </div>
             </div>
-            <input type="text" id="manual-input" class="input-field" placeholder="...">
+            <input type="text" id="manual-input" class="input-field py-4 text-3xl" placeholder="...">
           </div>
 
-          <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-2"></div>
-
-          <button id="save-btn" onclick="saveRecord()" class="btn btn-disabled mt-auto">確認並儲存</button>
+          <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-4"></div>
+          
+          <button id="save-btn" onclick="saveRecord()" class="btn btn-disabled mt-auto h-16 text-xl">確認並儲存</button>
         </div>
       </div>
     </div>
@@ -377,6 +349,15 @@
       setTimeout(() => e.className = 'hidden', 3000);
     }
     function syncAI() { document.getElementById('manual-input').value = document.getElementById('ai-res-val').innerText; }
+    
+    function copyToClipboard() {
+      const input = document.getElementById('manual-input');
+      if (!input.value) return;
+      input.select();
+      document.execCommand('copy');
+      showStatus('✓ 已複製到剪貼簿', 'green');
+    }
+
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('zh-TW', { hour12: false }); }, 1000);
   </script>
 </body>
