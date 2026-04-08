@@ -20,10 +20,18 @@
     /* Layout */
     #layout { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
     #header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; color: #fff; }
-    #main { flex: 1; display: grid; grid-template-columns: 5fr 3fr; gap: 12px; padding: 12px; min-height: 0; }
+    #main { 
+      flex: 1; 
+      display: grid; 
+      grid-template-columns: 62% 38%; 
+      gap: 16px; 
+      padding: 16px; 
+      min-height: 0; 
+      overflow: hidden;
+    }
     
     /* Left Column */
-    #cam-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+    #cam-col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
     #video-container { flex: 1; background: #000; position: relative; border-radius: 8px; overflow: hidden; }
     #video { width: 100%; height: 100%; object-fit: contain; }
     
@@ -42,7 +50,7 @@
     .br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; }
     
     /* Right Column (Analysis) */
-    #info-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+    #info-col { display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 360px; }
     #preview-area { 
       width: 100%; aspect-ratio: 1/1; 
       background: #f0f0f0; 
@@ -146,7 +154,7 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbylFV-KkdOillo75KWvrDIutYV0wyD9Xtx1Km5FqlB0whZvf1wSavmiE4vL8rawXG8w/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyt1CIHD__S6Fo3wrNeLDuffZemkBivKcFeWpi2A-5A5n1-nwWBItKcYh4E5n-1RBxY/exec';
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
