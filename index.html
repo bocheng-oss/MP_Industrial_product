@@ -360,7 +360,7 @@
             <select id="cam-sel"
               class="text-[10px] bg-gray-50 px-2 py-1 rounded font-bold border-none outline-none"></select>
           </div>
-          <div id="video-container" class="flex-1 min-h-0 bg-black rounded-lg overflow-hidden relative">
+          <div id="video-container" class="h-[55vh] bg-black rounded-lg overflow-hidden relative border border-gray-200">
             <video id="video" class="w-full h-full object-contain" autoplay playsinline muted></video>
             <div id="scanner-box">
               <div class="scan-corner tl"></div>
@@ -369,21 +369,19 @@
               <div class="scan-corner br"></div>
             </div>
           </div>
-          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3 text-lg shadow-sm flex-none">啟動影像辨識</button>
+          <button id="capture-btn" onclick="capture()" class="btn btn-red mt-3 text-lg shadow-sm">啟動影像辨識</button>
         </div>
       </div>
 
       <!-- 右側欄位 -->
-      <div id="info-col" class="flex flex-col h-full">
-        <div id="analysis-card" class="card h-full min-h-0 flex flex-col">
+      <div id="info-col">
+        <div id="analysis-card" class="card">
           <div class="text-xs font-bold flex items-center gap-2 mb-3 brand-text flex-none"><span
               class="w-1.5 h-4 brand-bg rounded-sm"></span>辨識結果</div>
           
-          <div id="preview-flex" class="flex-1 min-h-0">
-            <div id="preview-area" class="h-full">
-              <img id="preview-img" class="h-full w-full object-contain"
-                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' fill='%23eee'%3E%3Crect width='1000' height='1000'/%3E%3C/svg%3E">
-            </div>
+          <div id="preview-area" class="h-[55vh] bg-[#fdfdfd] rounded-lg border border-gray-100 flex items-center justify-center overflow-hidden">
+            <img id="preview-img" class="max-h-full max-w-full object-contain"
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' fill='%23eee'%3E%3Crect width='1000' height='1000'/%3E%3C/svg%3E">
           </div>
 
             <button onclick="copyToClipboard()" class="btn btn-gray col-span-1">複製</button>
