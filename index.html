@@ -81,7 +81,7 @@
       background: #000;
       border-radius: 8px;
       position: relative;
-      overflow: visible;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -427,33 +427,39 @@
     }
 
     async function start(id) {
-      // 1. 先停掉舊 stream 中的所有 track
+      // 停止所有舊 tracks
       if (currentStream) {
-        currentStream.getTracks().forEach(t => t.stop());
+        const tracks = currentStream.getTracks();
+        tracks.forEach(t => {
+          t.stop();
+          currentStream.removeTrack(t);
+        });
         currentStream = null;
       }
-      // 2. 清空 video 元素，強制釋放裝置
-      const video = document.getElementById('video');
-      video.srcObject = null;
 
-      // 3. 等待裝置釋放（關鍵：某些 OS/驅動需要時間切換）
-      await new Promise(resolve => setTimeout(resolve, 300));
+      const video = document.getElementById('video');
+      video.pause();
+      video.srcObject = null;
+      video.load(); // 強制 reset video element
+
+      // 等待 OS 釋放裝置
+      await new Promise(r => setTimeout(r, 500));
 
       try {
-        // 4. 用 exact 精確鎖定設備
         const constraints = id
-          ? { video: { deviceId: { exact: id }, width: { ideal: 1280 }, height: { ideal: 720 } } }
+          ? { video: { deviceId: { exact: id } } }
           : { video: true };
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
-      } catch (e) {
-        console.error('Camera start failed:', e);
-        // exact 失敗時退回不指定裝置
-        if (id) {
-          try {
-            currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = currentStream;
-          } catch (e2) { console.error('Fallback also failed:', e2); }
+      } catch (err) {
+        console.error('start() exact failed, trying without id:', err.name, err.message);
+        // exact 失敗時嘗試不指定
+        try {
+          const fallback = { video: true };
+          currentStream = await navigator.mediaDevices.getUserMedia(fallback);
+          video.srcObject = currentStream;
+        } catch (err2) {
+          console.error('Fallback also failed:', err2);
         }
       }
     }
@@ -519,12 +525,16 @@
     const scanBox = document.getElementById('scanner-box');
     function updateScanSize(val) {
       const px = parseInt(val) + 'px';
-      scanBox.style.setProperty('width', px, 'important');
-      scanBox.style.setProperty('height', px, 'important');
+      // 直接設定 inline style，優先序高於所有 CSS
+      scanBox.setAttribute('style',
+        `width:${px} !important; height:${px} !important;` +
+        `position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);`
+      );
     }
     scanSlider.addEventListener('input', (e) => updateScanSize(e.target.value));
-    // 頁面載入後初始化
-    window.addEventListener('load', () => updateScanSize(scanSlider.value));
+    // 直接呼叫（不依賴 load 事件，script 在 body 底部已能存取 DOM）
+    updateScanSize(scanSlider.value);
+    
 
     // 移除掉不需要的 interval (因為 clock 已拿掉)
     // setInterval(() => { ... }, 1000); 
