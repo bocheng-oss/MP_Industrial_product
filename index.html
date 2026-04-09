@@ -304,13 +304,13 @@
 
   <div id="layout">
     <header id="header" class="brand-bg">
-      <div class="flex items-center gap-2 font-bold text-sm">工業產品辨識終端</div>
-      <div class="flex items-center gap-4 text-xs font-bold uppercase">
-        <span id="clock" class="bg-black/10 px-2.5 py-1 rounded">00:00:00</span>
+      <div class="flex items-center gap-3 font-bold text-sm">
+        <img src="mp_logo.svg" alt="LOGO" class="h-7">
+        工業產品辨識終端
+      </div>
+      <div class="flex items-center">
         <button onclick="toggleSettings(true)"
-          class="btn-settings px-3 py-1 rounded flex items-center gap-1 transition-all active:scale-95">設定</button>
-        <span class="flex items-center gap-1.5"><span
-            class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>System Online</span>
+          class="btn-settings px-3 py-1 rounded flex items-center gap-1 transition-all active:scale-95 text-xs font-bold uppercase">設定</button>
       </div>
     </header>
 
@@ -423,12 +423,30 @@
     }
 
     async function start(id) {
-      if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-      currentStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: id } } });
-      document.getElementById('video').srcObject = currentStream;
+      if (currentStream) {
+        currentStream.getTracks().forEach(t => t.stop());
+      }
+      try {
+        const constraints = {
+          video: id ? { deviceId: { exact: id } } : { video: true }
+        };
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const video = document.getElementById('video');
+        video.srcObject = currentStream;
+        await video.play();
+      } catch (e) {
+        console.error('Camera start failed:', e);
+        // 如果指定設備失敗，嘗試使用預設設備
+        if (id) {
+          console.log('Retrying with default camera...');
+          start(null);
+        }
+      }
     }
 
-    document.getElementById('cam-sel').onchange = (e) => start(e.target.value);
+    document.getElementById('cam-sel').addEventListener('change', (e) => {
+      start(e.target.value);
+    });
 
     async function capture() {
       const v = document.getElementById('video'), box = document.getElementById('scanner-box');
@@ -481,12 +499,19 @@
       if (!val) return;
       navigator.clipboard.writeText(val).then(() => showStatus('✓ 已複製', 'blue'));
     }
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('zh-TW', { hour12: false }); }, 1000);
 
     // 監聽紅框大小調整
-    document.getElementById('scan-size-slider').addEventListener('input', (e) => {
-      document.documentElement.style.setProperty('--scan-size', e.target.value + 'px');
-    });
+    const scanSlider = document.getElementById('scan-size-slider');
+    const updateScanSize = (val) => {
+      document.documentElement.style.setProperty('--scan-size', val + 'px');
+    };
+    scanSlider.addEventListener('input', (e) => updateScanSize(e.target.value));
+    // 初始化尺寸
+    updateScanSize(scanSlider.value);
+
+    // 移除掉不需要的 interval (因為 clock 已拿掉)
+    // setInterval(() => { ... }, 1000); 
+    
   </script>
 </body>
 
