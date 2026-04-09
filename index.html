@@ -390,7 +390,7 @@
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null;
 
-    if (API_URL) document.getElementById('api-url-input').value = API_URL;
+    // api-url-input 已從設定彈窗移除，此行已刪除
 
     function toggleSettings(show) {
       const modal = document.getElementById('settings-overlay');
