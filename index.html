@@ -9,7 +9,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* 智慧型 RWD：當視窗變成直式 (寬 < 高) 或手機版時自動切換 */
     @media (max-width: 900px), (max-aspect-ratio: 1/1) {
       #main {
         display: flex !important;
@@ -23,13 +22,8 @@
       #layout { height: auto !important; }
     }
 
-    .brand-bg {
-      background: #e2231a;
-    }
-
-    .brand-text {
-      color: #e2231a;
-    }
+    .brand-bg { background: #e2231a; }
+    .brand-text { color: #e2231a; }
 
     #layout {
       display: flex;
@@ -47,28 +41,27 @@
       flex-shrink: 0;
     }
 
-    #main { 
-      flex: 1; 
-      display: grid; 
-      grid-template-columns: 3fr 2fr; 
-      gap: 12px; 
-      padding: 12px 16px 20px 16px; 
-      min-height: 0; 
-      overflow: hidden; /* 強制不准出現捲軸 */
+    #main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 12px;
+      padding: 12px 16px 20px 16px;
+      min-height: 0;
+      overflow: hidden;
     }
 
-    .card { 
-      background: #fff; 
-      border-radius: 12px; 
-      padding: 16px; 
-      display: flex; 
-      flex-direction: column; 
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      height: fit-content; /* 核心修正：讓卡片根據內容包裹，消除巨大空白 */
+      height: fit-content;
       max-height: 100%;
     }
 
-    /* 關鍵：讓視訊與預覽圖區塊自動延伸以對齊底部 */
     .grow-area {
       flex: 1;
       min-height: 0;
@@ -123,29 +116,10 @@
       border-width: 0;
     }
 
-    .tl {
-      top: -1px;
-      left: -1px;
-      border-width: 4px 0 0 4px;
-    }
-
-    .tr {
-      top: -1px;
-      right: -1px;
-      border-width: 4px 4px 0 0;
-    }
-
-    .bl {
-      bottom: -1px;
-      left: -1px;
-      border-width: 0 0 4px 4px;
-    }
-
-    .br {
-      bottom: -1px;
-      right: -1px;
-      border-width: 0 4px 4px 0;
-    }
+    .tl { top: -1px; left: -1px; border-width: 4px 0 0 4px; }
+    .tr { top: -1px; right: -1px; border-width: 4px 4px 0 0; }
+    .bl { bottom: -1px; left: -1px; border-width: 0 0 4px 4px; }
+    .br { bottom: -1px; right: -1px; border-width: 0 4px 4px 0; }
 
     #preview-area {
       background: #f8fafc;
@@ -179,27 +153,10 @@
       border: none;
     }
 
-    .btn-red {
-      background: #e2231a;
-      color: #fff;
-    }
-
-    .btn-gray {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #e2e8f0;
-    }
-
-    .btn-disabled {
-      background: #f1f5f9;
-      color: #cbd5e1;
-      cursor: not-allowed;
-    }
-
-    .btn-settings {
-      background: rgba(0, 0, 0, 0.1);
-      color: #fff;
-    }
+    .btn-red { background: #e2231a; color: #fff; }
+    .btn-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; }
+    .btn-settings { background: rgba(0, 0, 0, 0.1); color: #fff; }
 
     .lbl {
       color: #e2231a;
@@ -369,7 +326,8 @@
             <span class="lbl" style="color:#64748b">人工核對數據</span>
             <input type="text" id="manual-input"
               style="width:100%; border:none; outline:none; font-weight:bold; font-size:28px; background:transparent;"
-              placeholder="...">
+              placeholder="..."
+              oninput="onManualInputChange()">
           </div>
 
           <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-2 font-bold"></div>
@@ -386,16 +344,13 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    let API_URL = 'https://script.google.com/macros/s/AKfycbz4WsEpYtFORHZMAeUjyEwA1zTBlRqGwkGZWqUXR1zo2J3j8yEsl2C3etlySKfULJA2/exec'; // 請在此直接更新網址
+    let API_URL = 'https://script.google.com/macros/s/AKfycbz4WsEpYtFORHZMAeUjyEwA1zTBlRqGwkGZWqUXR1zo2J3j8yEsl2C3etlySKfULJA2/exec';
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
-    let currentStream = null, lastB64 = null;
-
-    // api-url-input 已從設定彈窗移除，此行已刪除
+    let currentStream = null, lastB64 = null, lastAiResult = '';
 
     function toggleSettings(show) {
       const modal = document.getElementById('settings-overlay');
-      if (show) { modal.style.display = 'flex'; }
-      else { modal.style.display = 'none'; }
+      modal.style.display = show ? 'flex' : 'none';
     }
 
     async function checkAccess() {
@@ -427,46 +382,29 @@
     }
 
     async function start(id) {
-      // 停止所有舊 tracks
       if (currentStream) {
-        const tracks = currentStream.getTracks();
-        tracks.forEach(t => {
-          t.stop();
-          currentStream.removeTrack(t);
-        });
+        currentStream.getTracks().forEach(t => t.stop());
         currentStream = null;
       }
-
       const video = document.getElementById('video');
       video.pause();
       video.srcObject = null;
-      video.load(); // 強制 reset video element
-
-      // 等待 OS 釋放裝置
+      video.load();
       await new Promise(r => setTimeout(r, 500));
-
       try {
-        const constraints = id
-          ? { video: { deviceId: { exact: id } } }
-          : { video: true };
+        const constraints = id ? { video: { deviceId: { exact: id } } } : { video: true };
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
       } catch (err) {
-        console.error('start() exact failed, trying without id:', err.name, err.message);
-        // exact 失敗時嘗試不指定
+        console.error('start() exact failed:', err.name, err.message);
         try {
-          const fallback = { video: true };
-          currentStream = await navigator.mediaDevices.getUserMedia(fallback);
+          currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
           video.srcObject = currentStream;
-        } catch (err2) {
-          console.error('Fallback also failed:', err2);
-        }
+        } catch (err2) { console.error('Fallback also failed:', err2); }
       }
     }
 
-    document.getElementById('cam-sel').addEventListener('change', (e) => {
-      start(e.target.value);
-    });
+    document.getElementById('cam-sel').addEventListener('change', (e) => start(e.target.value));
 
     async function capture() {
       const v = document.getElementById('video'), box = document.getElementById('scanner-box');
@@ -484,21 +422,62 @@
       lastB64 = b64.split(',')[1];
       document.getElementById('preview-img').src = b64;
       document.getElementById('ai-res-val').innerText = '...';
+      document.getElementById('manual-input').value = '';
+      document.getElementById('save-btn').className = 'btn btn-disabled col-span-3';
+
       const res = await callBackend('recognize', { imageBase64: lastB64 });
-      if (res.success && !res.result.includes('Error')) {
+      const isError = !res.success || (res.result && (res.result.includes('Error') || res.result.includes('SERVER_ERROR')));
+      if (!isError) {
+        lastAiResult = res.result;
         document.getElementById('ai-res-val').innerText = res.result;
         document.getElementById('manual-input').value = res.result;
-        document.getElementById('save-btn').className = 'btn btn-red col-span-3 shadow-md';
+        // AI 辨識成功後自動複製，作業員可直接貼到 ERP
+        navigator.clipboard.writeText(res.result)
+          .then(() => showStatus('✓ 已自動複製編號，可直接貼上 ERP', 'green'))
+          .catch(() => showStatus('✓ 辨識完成', 'green'));
+        // 照片辨識正確不需儲存，儲存紀錄維持 disabled
+        document.getElementById('save-btn').className = 'btn btn-disabled col-span-3';
+      } else {
+        lastAiResult = '';
+        document.getElementById('ai-res-val').innerText = '--';
+        showStatus('⚠️ 模型正在忙碌中，請稍後再試', 'red');
+      }
+    }
+
+    // 人工核對欄位變更：與 AI 結果不同時才啟用儲存紀錄
+    function onManualInputChange() {
+      const manualVal = document.getElementById('manual-input').value.trim();
+      const saveBtn = document.getElementById('save-btn');
+      if (lastAiResult && manualVal && manualVal !== lastAiResult) {
+        saveBtn.className = 'btn btn-red col-span-3 shadow-md';
+      } else {
+        saveBtn.className = 'btn btn-disabled col-span-3';
       }
     }
 
     async function saveRecord() {
-      const b = document.getElementById('save-btn'); if (b.classList.contains('btn-disabled')) return;
-      const oldTxt = b.innerText; b.innerText = '處理中...'; b.className = 'btn btn-disabled col-span-3';
+      const b = document.getElementById('save-btn');
+      if (b.classList.contains('btn-disabled')) return;
+      const oldTxt = b.innerText;
+      b.innerText = '處理中...'; b.className = 'btn btn-disabled col-span-3';
+      const manualVal = document.getElementById('manual-input').value;
       const res = await callBackend('save', {
-        imageBase64: lastB64, aiResult: document.getElementById('ai-res-val').innerText, manualResult: document.getElementById('manual-input').value
+        imageBase64: lastB64,
+        aiResult: document.getElementById('ai-res-val').innerText,
+        manualResult: manualVal
       });
-      if (res.success) { showStatus('✓ 儲存成功', 'green'); b.innerText = oldTxt; b.className = 'btn btn-red col-span-3'; }
+      if (res.success) {
+        // 儲存成功後自動複製人工核對數據
+        navigator.clipboard.writeText(manualVal)
+          .then(() => showStatus('✓ 儲存成功！已自動複製人工核對數據', 'green'))
+          .catch(() => showStatus('✓ 儲存成功', 'green'));
+        b.innerText = oldTxt;
+        b.className = 'btn btn-disabled col-span-3'; // 儲存後鎖定，避免重複儲存
+      } else {
+        showStatus('❌ 儲存失敗，請重試', 'red');
+        b.innerText = oldTxt;
+        b.className = 'btn btn-red col-span-3';
+      }
     }
 
     async function callBackend(action, extra) {
@@ -510,7 +489,9 @@
     }
 
     function showStatus(m, c) {
-      const e = document.getElementById('status-msg'); e.innerText = m; e.className = `block text-center text-[10px] p-2 rounded mb-2 bg-${c}-50 text-${c}-600 font-bold`;
+      const e = document.getElementById('status-msg');
+      e.innerText = m;
+      e.className = `block text-center text-[10px] p-2 rounded mb-2 bg-${c}-50 text-${c}-600 font-bold`;
       setTimeout(() => e.className = 'hidden', 3000);
     }
 
@@ -520,25 +501,18 @@
       navigator.clipboard.writeText(val).then(() => showStatus('✓ 已複製', 'blue'));
     }
 
-    // 監聽紅框大小調整
+    // 紅框大小調整
     const scanSlider = document.getElementById('scan-size-slider');
     const scanBox = document.getElementById('scanner-box');
     function updateScanSize(val) {
       const px = parseInt(val) + 'px';
-      // 直接設定 inline style，優先序高於所有 CSS
       scanBox.setAttribute('style',
         `width:${px} !important; height:${px} !important;` +
         `position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);`
       );
     }
     scanSlider.addEventListener('input', (e) => updateScanSize(e.target.value));
-    // 直接呼叫（不依賴 load 事件，script 在 body 底部已能存取 DOM）
     updateScanSize(scanSlider.value);
-    
-
-    // 移除掉不需要的 interval (因為 clock 已拿掉)
-    // setInterval(() => { ... }, 1000); 
-    
   </script>
 </body>
 
