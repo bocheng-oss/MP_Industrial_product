@@ -9,7 +9,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    @media (max-width: 900px), (max-aspect-ratio: 1/1) {
+    @media (max-width: 900px),
+    (max-aspect-ratio: 1/1) {
       #main {
         display: flex !important;
         flex-direction: column !important;
@@ -17,13 +18,31 @@
         overflow-y: auto !important;
         padding-bottom: 40px !important;
       }
-      body { overflow-y: auto !important; position: static !important; }
-      #cam-card, #analysis-card { width: 100% !important; margin-bottom: 12px; height: auto !important; }
-      #layout { height: auto !important; }
+
+      body {
+        overflow-y: auto !important;
+        position: static !important;
+      }
+
+      #cam-card,
+      #analysis-card {
+        width: 100% !important;
+        margin-bottom: 12px;
+        height: auto !important;
+      }
+
+      #layout {
+        height: auto !important;
+      }
     }
 
-    .brand-bg { background: #e2231a; }
-    .brand-text { color: #e2231a; }
+    .brand-bg {
+      background: #e2231a;
+    }
+
+    .brand-text {
+      color: #e2231a;
+    }
 
     #layout {
       display: flex;
@@ -57,7 +76,7 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       height: fit-content;
       max-height: 100%;
     }
@@ -103,8 +122,17 @@
     }
 
     @keyframes scan-pulse {
-      0%, 100% { border-color: rgba(226, 35, 26, 0.4); box-shadow: 0 0 15px rgba(226, 35, 26, 0.2); }
-      50% { border-color: rgba(226, 35, 26, 0.8); box-shadow: 0 0 25px rgba(226, 35, 26, 0.4); }
+
+      0%,
+      100% {
+        border-color: rgba(226, 35, 26, 0.4);
+        box-shadow: 0 0 15px rgba(226, 35, 26, 0.2);
+      }
+
+      50% {
+        border-color: rgba(226, 35, 26, 0.8);
+        box-shadow: 0 0 25px rgba(226, 35, 26, 0.4);
+      }
     }
 
     .scan-corner {
@@ -116,10 +144,29 @@
       border-width: 0;
     }
 
-    .tl { top: -1px; left: -1px; border-width: 4px 0 0 4px; }
-    .tr { top: -1px; right: -1px; border-width: 4px 4px 0 0; }
-    .bl { bottom: -1px; left: -1px; border-width: 0 0 4px 4px; }
-    .br { bottom: -1px; right: -1px; border-width: 0 4px 4px 0; }
+    .tl {
+      top: -1px;
+      left: -1px;
+      border-width: 4px 0 0 4px;
+    }
+
+    .tr {
+      top: -1px;
+      right: -1px;
+      border-width: 4px 4px 0 0;
+    }
+
+    .bl {
+      bottom: -1px;
+      left: -1px;
+      border-width: 0 0 4px 4px;
+    }
+
+    .br {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 4px 4px 0;
+    }
 
     #preview-area {
       background: #f8fafc;
@@ -138,8 +185,24 @@
       object-fit: contain;
     }
 
-    #ai-box { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; padding: 8px 12px; margin-top: 8px; flex-shrink: 0; }
-    .manual-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-top: 8px; margin-bottom: 24px; flex-shrink: 0; }
+    #ai-box {
+      background: #fff1f0;
+      border: 1px solid #ffa39e;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+
+    .manual-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      margin-bottom: 24px;
+      flex-shrink: 0;
+    }
 
     .btn {
       height: 46px;
@@ -153,10 +216,27 @@
       border: none;
     }
 
-    .btn-red { background: #e2231a; color: #fff; }
-    .btn-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-    .btn-disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; }
-    .btn-settings { background: rgba(0, 0, 0, 0.1); color: #fff; }
+    .btn-red {
+      background: #e2231a;
+      color: #fff;
+    }
+
+    .btn-gray {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-disabled {
+      background: #f1f5f9;
+      color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .btn-settings {
+      background: rgba(0, 0, 0, 0.1);
+      color: #fff;
+    }
 
     .lbl {
       color: #e2231a;
@@ -254,8 +334,7 @@
           <div class="text-[10px] font-bold text-gray-400 mb-1 uppercase">AI 辨識模型</div>
           <select id="model-sel-input" class="control-input font-bold">
             <option value="gemini-3-flash-preview">Gemini 3 Flash (穩定)</option>
-            <option value="gemini-1.5-pro">Gemini 1.5 Pro (精準)</option>
-            <option value="gemma-27b">Gemma 27B IT</option>
+            <option value="gemini-2.5-flash-preview-04-17">Gemini 2.5 Flash (測試)</option>
           </select>
         </div>
         <button onclick="toggleSettings(false)" class="btn btn-red w-full mt-2">儲存並套用</button>
@@ -284,7 +363,8 @@
             <div class="flex items-center gap-3">
               <div class="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded">
                 <span class="text-[9px] font-bold text-gray-400">框尺寸</span>
-                <input type="range" id="scan-size-slider" min="100" max="400" value="220" class="w-20 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600">
+                <input type="range" id="scan-size-slider" min="100" max="400" value="220"
+                  class="w-20 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600">
               </div>
               <select id="cam-sel"
                 class="text-[10px] bg-gray-50 px-2 py-1 rounded font-bold border-none outline-none"></select>
@@ -326,8 +406,7 @@
             <span class="lbl" style="color:#64748b">人工核對數據</span>
             <input type="text" id="manual-input"
               style="width:100%; border:none; outline:none; font-weight:bold; font-size:28px; background:transparent;"
-              placeholder="..."
-              oninput="onManualInputChange()">
+              placeholder="..." oninput="onManualInputChange()">
           </div>
 
           <div id="status-msg" class="hidden text-center text-[10px] p-2 rounded mb-2 font-bold"></div>
@@ -344,7 +423,7 @@
   <canvas id="crop-cvs" style="display:none;"></canvas>
 
   <script>
-    let API_URL = 'https://script.google.com/macros/s/AKfycbz4WsEpYtFORHZMAeUjyEwA1zTBlRqGwkGZWqUXR1zo2J3j8yEsl2C3etlySKfULJA2/exec';
+    let API_URL = 'https://script.google.com/macros/s/AKfycbwXszoq9WRHx0CPNdTUNAWubWl0zzk20MFhS3ni_hMR5HSoAwU3XvLk9tU7OeSYD0Rb/exec';
     let ACCESS_CODE = localStorage.getItem('demo_access_code') || '';
     let currentStream = null, lastB64 = null, lastAiResult = '';
 
@@ -425,7 +504,8 @@
       document.getElementById('manual-input').value = '';
       document.getElementById('save-btn').className = 'btn btn-disabled col-span-3';
 
-      const res = await callBackend('recognize', { imageBase64: lastB64 });
+      const selectedModel = document.getElementById('model-sel-input')?.value || 'gemini-3-flash-preview';
+      const res = await callBackend('recognize', { imageBase64: lastB64, model: selectedModel });
       const isError = !res.success || (res.result && (res.result.includes('Error') || res.result.includes('SERVER_ERROR')));
       if (!isError) {
         lastAiResult = res.result;
